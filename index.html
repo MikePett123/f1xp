@@ -740,11 +740,12 @@ function toggleRace(i) {
 // ═══════════════════════════════════════════════════════
 
 function computeChampPositions() {
-    const fullRaces = PAST_RACES.filter(r => !r.isSprint);
+    // Use current race number (3) so expected positions reflect what we know NOW
+    const currentRaceNum = PAST_RACES.filter(r => !r.isSprint).length + 1;
     const expSum = {}, expN = {};
-    fullRaces.forEach(race => {
+    PAST_RACES.filter(r => !r.isSprint).forEach(() => {
         [...DRIVERS]
-            .map(d => ({ id: d.id, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
+            .map(d => ({ id: d.id, score: carCoeff(d.team, currentRaceNum) * (1 + (d.f125 - 85) * 0.003) }))
             .sort((a, b) => b.score - a.score)
             .forEach((d, i) => { expSum[d.id] = (expSum[d.id] || 0) + i + 1; expN[d.id] = (expN[d.id] || 0) + 1; });
     });
@@ -755,12 +756,12 @@ function computeChampPositions() {
     const expChampPos = {};
     sorted.forEach((d, i) => { expChampPos[d.id] = i + 1; });
 
-    // Constructor exp champ pos: sum two drivers' avg exp race pos per race, rank teams
+    // Constructor exp champ pos using current race number
     const teamExpSum = {}, teamExpN = {};
-    fullRaces.forEach(race => {
+    PAST_RACES.filter(r => !r.isSprint).forEach(() => {
         const raceRanks = {};
         [...DRIVERS]
-            .map(d => ({ id: d.id, team: d.team, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
+            .map(d => ({ id: d.id, team: d.team, score: carCoeff(d.team, currentRaceNum) * (1 + (d.f125 - 85) * 0.003) }))
             .sort((a, b) => b.score - a.score)
             .forEach((d, i) => { raceRanks[d.id] = i + 1; });
         DRIVERS.forEach(d => {
