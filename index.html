@@ -355,11 +355,12 @@ const TEAM_DATA_COEFF = {
     haas:         1.054,  // 68/100 — season's biggest surprise; Bearman faster than Verstappen
     mclaren:      1.036,  // 62/100 — reigning champs underperforming; double DNS masks real pace
     red_bull:     0.994,  // 48/100 — Ford-RBP weakest new PU; Verstappen openly critical of regs
-    racing_bulls: 0.976,  // 42/100 — scoring but no standout pace; junior team resources
-    alpine:       1.024,  // 58/100 — Gasly points in CHN; Mercedes PU performing well
-    williams:     0.964,  // 38/100 — Sainz quietly picking up points; back-midfield ceiling
-    audi:         0.958,  // 36/100 — limited data; VW money but new-entry learning curve
-    cadillac:     0.916,  // 22/100 — new entry, no points yet; infrastructure still ramping
+    alpine:       1.024,  // 58/100 — Gasly scored both races; Mercedes PU performing well
+    racing_bulls: 1.018,  // 56/100 — Lindblad P8 AUS debut, Lawson P7 CHN; promising pair
+    red_bull:     0.994,  // 48/100 — Ford-RBP weakest new PU; Verstappen openly critical of regs
+    williams:     0.982,  // 44/100 — Sainz P9 CHN; Albon DNS CHN; quiet lower midfield
+    audi:         0.970,  // 40/100 — Bortoleto P9 AUS; Hülkenberg DNS both races
+    cadillac:     0.925,  // 25/100 — new entry, no points yet; infrastructure still ramping
     aston_martin: 0.910,  // 20/100 — worst on grid; only team without excuse for zero points
 };
 
@@ -382,10 +383,10 @@ const DEV_POTENTIAL = {
 
 function blendWeights(raceNum) {
     if (raceNum <= 0)  return [1.00, 0.00]; // pre-season: prior only
-    if (raceNum <= 2)  return [0.72, 0.28]; // R1–R2: heavily prior-weighted
-    if (raceNum <= 5)  return [0.42, 0.58]; // R3–R5: transitioning
-    if (raceNum <= 12) return [0.12, 0.88]; // R6–R12: mostly data
-    return [0.05, 0.95];                    // R13+:  near-pure data
+    if (raceNum <= 2)  return [0.55, 0.45]; // R1–R2: prior-leaning
+    if (raceNum <= 5)  return [0.20, 0.80]; // R3–R5: data dominant
+    if (raceNum <= 12) return [0.07, 0.93]; // R6–R12: near-pure data
+    return [0.03, 0.97];                    // R13+:  pure data
 }
 
 function carCoeff(team, raceNum) {
