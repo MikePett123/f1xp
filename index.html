@@ -167,12 +167,6 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl p-4 mb-5 flex flex-wrap gap-4 border border-f1-dark/8 text-sm">
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-f1-teal"></span><span class="text-f1-muted">Iconic S-curves demand aerodynamic precision</span></div>
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-f1-teal"></span><span class="text-f1-muted">130R and Spoon challenge high-downforce setups</span></div>
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-f1-coral"></span><span class="text-f1-muted">High deg — tyre management critical</span></div>
-                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-f1-coral"></span><span class="text-f1-muted">Aston Martin Honda PU home advantage</span></div>
-            </div>
 
             <div class="bg-white rounded-2xl overflow-hidden border border-f1-dark/8">
                 <div class="px-6 py-4 border-b border-f1-cream flex items-center justify-between">
@@ -213,11 +207,12 @@
                 </div>
                 <div class="grid grid-cols-12 gap-2 px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
                     <div class="col-span-1">#</div>
-                    <div class="col-span-4">Driver</div>
-                    <div class="col-span-2 hidden md:block">Team</div>
+                    <div class="col-span-3">Driver</div>
                     <div class="col-span-2 text-right">Pts</div>
-                    <div class="col-span-2 text-right">F1XP</div>
-                    <div class="col-span-1 text-right hidden sm:block">Δ</div>
+                    <div class="col-span-1 text-right">XP</div>
+                    <div class="col-span-1 text-right">Δ</div>
+                    <div class="col-span-2 text-right">Exp Pos</div>
+                    <div class="col-span-2 text-right">Avg Pos</div>
                 </div>
                 <div id="driver-standings" class="divide-y divide-f1-cream"></div>
             </div>
@@ -741,13 +736,33 @@ function toggleRace(i) {
 //  RENDER — CHAMPIONSHIP
 // ═══════════════════════════════════════════════════════
 
+function computeAvgPositions() {
+    const fullRaces = PAST_RACES.filter(r => !r.isSprint);
+    const expSum = {}, expN = {}, actSum = {}, actN = {};
+    fullRaces.forEach(race => {
+        [...DRIVERS]
+            .map(d => ({ id: d.id, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
+            .sort((a, b) => b.score - a.score)
+            .forEach((d, i) => { expSum[d.id] = (expSum[d.id] || 0) + i + 1; expN[d.id] = (expN[d.id] || 0) + 1; });
+        race.results.forEach(r => { actSum[r.id] = (actSum[r.id] || 0) + r.pos; actN[r.id] = (actN[r.id] || 0) + 1; });
+    });
+    const out = {};
+    DRIVERS.forEach(d => { out[d.id] = {
+        exp: expN[d.id] ? +(expSum[d.id] / expN[d.id]).toFixed(1) : null,
+        act: actN[d.id] ? +(actSum[d.id] / actN[d.id]).toFixed(1) : null,
+    }; });
+    return out;
+}
+
 function renderChampionship() {
     const xpAcc = computeAccumulatedF1XP();
+    const avgPos = computeAvgPositions();
 
     const standings = DRIVERS.map(d => ({
         driver: d, team: TEAMS[d.team],
         pts: ACTUAL_POINTS[d.id] || 0,
         xp:  xpAcc[d.id] || 0,
+        avg: avgPos[d.id] || {},
     })).sort((a, b) => b.pts - a.pts);
 
     document.getElementById('driver-standings').innerHTML = standings.map((s, i) => {
@@ -757,20 +772,23 @@ function renderChampionship() {
         const deltaColor = delta > 2 ? 'text-green-500 font-bold' :
                            delta < -2 ? 'text-red-400 font-bold' : 'text-f1-muted';
         const deltaStr   = Math.abs(delta) < 0.5 ? '~0' : (delta > 0 ? '+' : '') + delta;
+        const expPosStr  = s.avg.exp != null ? `P${s.avg.exp}` : '—';
+        const actPosStr  = s.avg.act != null ? `P${s.avg.act}` : '—';
         return `
         <div class="champ-row grid grid-cols-12 gap-2 px-6 py-3.5 items-center transition-colors">
             <div class="col-span-1 text-sm ${rankStyle}">${rank}</div>
-            <div class="col-span-4 flex items-center gap-2">
-                <div class="w-1 h-7 rounded-full" style="background:${s.team.color}"></div>
+            <div class="col-span-3 flex items-center gap-2">
+                <div class="w-1 h-7 rounded-full flex-shrink-0" style="background:${s.team.color}"></div>
                 <div>
-                    <div class="font-bold text-sm text-f1-dark">${s.driver.name}</div>
-                    <div class="text-xs text-f1-muted">${s.driver.nationality}</div>
+                    <div class="font-bold text-sm text-f1-dark leading-tight">${s.driver.name}</div>
+                    <div class="text-xs text-f1-muted">${s.team.name}</div>
                 </div>
             </div>
-            <div class="col-span-2 text-sm text-f1-muted font-semibold hidden md:block truncate">${s.team.name}</div>
             <div class="col-span-2 text-right font-black text-f1-dark tabular-nums">${s.pts}</div>
-            <div class="col-span-2 text-right text-f1-muted text-sm tabular-nums">${s.xp}</div>
-            <div class="col-span-1 text-right text-xs ${deltaColor} hidden sm:block">${deltaStr}</div>
+            <div class="col-span-1 text-right text-f1-muted text-sm tabular-nums">${s.xp}</div>
+            <div class="col-span-1 text-right text-xs ${deltaColor}">${deltaStr}</div>
+            <div class="col-span-2 text-right text-sm text-f1-muted tabular-nums">${expPosStr}</div>
+            <div class="col-span-2 text-right text-sm font-semibold text-f1-dark tabular-nums">${actPosStr}</div>
         </div>`;
     }).join('');
 
