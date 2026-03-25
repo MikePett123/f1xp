@@ -748,8 +748,8 @@ function computeAvgPositions() {
     });
     const out = {};
     DRIVERS.forEach(d => { out[d.id] = {
-        exp: expN[d.id] ? +(expSum[d.id] / expN[d.id]).toFixed(1) : null,
-        act: actN[d.id] ? +(actSum[d.id] / actN[d.id]).toFixed(1) : null,
+        exp: expN[d.id] ? Math.round(expSum[d.id] / expN[d.id]) : null,
+        act: actN[d.id] ? Math.round(actSum[d.id] / actN[d.id]) : null,
     }; });
     return out;
 }
