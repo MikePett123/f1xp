@@ -210,9 +210,9 @@
                     <div class="col-span-3">Driver</div>
                     <div class="col-span-2 text-right">Pts</div>
                     <div class="col-span-1 text-right">XP</div>
-                    <div class="col-span-1 text-right">Δ</div>
-                    <div class="col-span-2 text-right">Exp Pos</div>
-                    <div class="col-span-2 text-right">Avg Pos</div>
+                    <div class="col-span-1 text-right">Δ XP</div>
+                    <div class="col-span-2 text-right">Exp. Champ</div>
+                    <div class="col-span-2 text-right">Δ Pos</div>
                 </div>
                 <div id="driver-standings" class="divide-y divide-f1-cream"></div>
             </div>
@@ -224,9 +224,11 @@
                 </div>
                 <div class="grid grid-cols-12 gap-2 px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
                     <div class="col-span-1">#</div>
-                    <div class="col-span-5">Constructor</div>
-                    <div class="col-span-3 text-right">Points</div>
-                    <div class="col-span-3 text-right">F1XP</div>
+                    <div class="col-span-3">Constructor</div>
+                    <div class="col-span-2 text-right">Pts</div>
+                    <div class="col-span-2 text-right">XP</div>
+                    <div class="col-span-2 text-right">Exp. Champ</div>
+                    <div class="col-span-2 text-right">Δ Pos</div>
                 </div>
                 <div id="constructor-standings" class="divide-y divide-f1-cream"></div>
             </div>
@@ -736,44 +738,66 @@ function toggleRace(i) {
 //  RENDER — CHAMPIONSHIP
 // ═══════════════════════════════════════════════════════
 
-function computeAvgPositions() {
+function computeChampPositions() {
     const fullRaces = PAST_RACES.filter(r => !r.isSprint);
-    const expSum = {}, expN = {}, actSum = {}, actN = {};
+    const expSum = {}, expN = {};
     fullRaces.forEach(race => {
         [...DRIVERS]
             .map(d => ({ id: d.id, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
             .sort((a, b) => b.score - a.score)
             .forEach((d, i) => { expSum[d.id] = (expSum[d.id] || 0) + i + 1; expN[d.id] = (expN[d.id] || 0) + 1; });
-        race.results.forEach(r => { actSum[r.id] = (actSum[r.id] || 0) + r.pos; actN[r.id] = (actN[r.id] || 0) + 1; });
     });
-    const out = {};
-    DRIVERS.forEach(d => { out[d.id] = {
-        exp: expN[d.id] ? Math.round(expSum[d.id] / expN[d.id]) : null,
-        act: actN[d.id] ? Math.round(actSum[d.id] / actN[d.id]) : null,
-    }; });
-    return out;
+    // Sort by float avg then assign sequential 1-22 (no ties)
+    const sorted = [...DRIVERS].sort((a, b) =>
+        (expN[a.id] ? expSum[a.id] / expN[a.id] : 999) - (expN[b.id] ? expSum[b.id] / expN[b.id] : 999)
+    );
+    const expChampPos = {};
+    sorted.forEach((d, i) => { expChampPos[d.id] = i + 1; });
+
+    // Constructor exp champ pos: sum two drivers' avg exp race pos per race, rank teams
+    const teamExpSum = {}, teamExpN = {};
+    fullRaces.forEach(race => {
+        const raceRanks = {};
+        [...DRIVERS]
+            .map(d => ({ id: d.id, team: d.team, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
+            .sort((a, b) => b.score - a.score)
+            .forEach((d, i) => { raceRanks[d.id] = i + 1; });
+        DRIVERS.forEach(d => {
+            teamExpSum[d.team] = (teamExpSum[d.team] || 0) + raceRanks[d.id];
+            teamExpN[d.team] = (teamExpN[d.team] || 0) + 1;
+        });
+    });
+    const sortedTeams = Object.keys(TEAMS).sort((a, b) =>
+        (teamExpN[a] ? teamExpSum[a] / teamExpN[a] : 999) - (teamExpN[b] ? teamExpSum[b] / teamExpN[b] : 999)
+    );
+    const expCtorPos = {};
+    sortedTeams.forEach((t, i) => { expCtorPos[t] = i + 1; });
+
+    return { expChampPos, expCtorPos };
 }
 
 function renderChampionship() {
     const xpAcc = computeAccumulatedF1XP();
-    const avgPos = computeAvgPositions();
+    const { expChampPos, expCtorPos } = computeChampPositions();
 
     const standings = DRIVERS.map(d => ({
         driver: d, team: TEAMS[d.team],
         pts: ACTUAL_POINTS[d.id] || 0,
         xp:  xpAcc[d.id] || 0,
-        avg: avgPos[d.id] || {},
+        expChamp: expChampPos[d.id] || null,
     })).sort((a, b) => b.pts - a.pts);
 
     document.getElementById('driver-standings').innerHTML = standings.map((s, i) => {
-        const rank  = i + 1;
-        const delta = +(s.pts - s.xp).toFixed(1);
-        const rankStyle  = rank <= 3 ? 'font-black text-f1-dark' : 'font-semibold text-f1-muted';
+        const rank      = i + 1;
+        const delta     = +(s.pts - s.xp).toFixed(1);
+        const rankStyle = rank <= 3 ? 'font-black text-f1-dark' : 'font-semibold text-f1-muted';
         const deltaColor = delta > 2 ? 'text-green-500 font-bold' :
                            delta < -2 ? 'text-red-400 font-bold' : 'text-f1-muted';
-        const deltaStr   = Math.abs(delta) < 0.5 ? '~0' : (delta > 0 ? '+' : '') + delta;
-        const expPosStr  = s.avg.exp != null ? `P${s.avg.exp}` : '—';
-        const actPosStr  = s.avg.act != null ? `P${s.avg.act}` : '—';
+        const deltaStr  = Math.abs(delta) < 0.5 ? '~0' : (delta > 0 ? '+' : '') + delta;
+        const expStr    = s.expChamp != null ? `P${s.expChamp}` : '—';
+        const posGap    = s.expChamp != null ? s.expChamp - rank : null;
+        const posColor  = posGap > 0 ? 'text-green-500 font-bold' : posGap < 0 ? 'text-red-400 font-bold' : 'text-f1-muted';
+        const posStr    = posGap == null ? '—' : posGap === 0 ? '~0' : (posGap > 0 ? '+' : '') + posGap;
         return `
         <div class="champ-row grid grid-cols-12 gap-2 px-6 py-3.5 items-center transition-colors">
             <div class="col-span-1 text-sm ${rankStyle}">${rank}</div>
@@ -787,8 +811,8 @@ function renderChampionship() {
             <div class="col-span-2 text-right font-black text-f1-dark tabular-nums">${s.pts}</div>
             <div class="col-span-1 text-right text-f1-muted text-sm tabular-nums">${s.xp}</div>
             <div class="col-span-1 text-right text-xs ${deltaColor}">${deltaStr}</div>
-            <div class="col-span-2 text-right text-sm text-f1-muted tabular-nums">${expPosStr}</div>
-            <div class="col-span-2 text-right text-sm font-semibold text-f1-dark tabular-nums">${actPosStr}</div>
+            <div class="col-span-2 text-right text-sm text-f1-muted tabular-nums">${expStr}</div>
+            <div class="col-span-2 text-right text-sm ${posColor} tabular-nums">${posStr}</div>
         </div>`;
     }).join('');
 
@@ -801,16 +825,25 @@ function renderChampionship() {
         ctorMap[t].xp  += s.xp;
     });
     const ctors = Object.values(ctorMap).sort((a, b) => b.pts - a.pts);
-    document.getElementById('constructor-standings').innerHTML = ctors.map((c, i) => `
+    document.getElementById('constructor-standings').innerHTML = ctors.map((c, i) => {
+        const rank   = i + 1;
+        const exp    = expCtorPos[Object.keys(TEAMS).find(k => TEAMS[k].name === c.team.name)] || null;
+        const posGap = exp != null ? exp - rank : null;
+        const posColor = posGap > 0 ? 'text-green-500 font-bold' : posGap < 0 ? 'text-red-400 font-bold' : 'text-f1-muted';
+        const posStr = posGap == null ? '—' : posGap === 0 ? '~0' : (posGap > 0 ? '+' : '') + posGap;
+        return `
         <div class="champ-row grid grid-cols-12 gap-2 px-6 py-4 items-center transition-colors">
-            <div class="col-span-1 text-sm font-semibold text-f1-muted">${i + 1}</div>
-            <div class="col-span-5 flex items-center gap-3">
-                <div class="w-3 h-3 rounded-full" style="background:${c.team.color}"></div>
-                <span class="font-bold text-f1-dark">${c.team.name}</span>
+            <div class="col-span-1 text-sm font-semibold text-f1-muted">${rank}</div>
+            <div class="col-span-3 flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full flex-shrink-0" style="background:${c.team.color}"></div>
+                <span class="font-bold text-f1-dark truncate">${c.team.name}</span>
             </div>
-            <div class="col-span-3 text-right font-black text-f1-dark text-lg tabular-nums">${c.pts}</div>
-            <div class="col-span-3 text-right text-f1-muted font-semibold tabular-nums">${c.xp}</div>
-        </div>`).join('');
+            <div class="col-span-2 text-right font-black text-f1-dark tabular-nums">${c.pts}</div>
+            <div class="col-span-2 text-right text-f1-muted font-semibold tabular-nums">${c.xp}</div>
+            <div class="col-span-2 text-right text-sm text-f1-muted tabular-nums">${exp != null ? 'P'+exp : '—'}</div>
+            <div class="col-span-2 text-right text-sm ${posColor} tabular-nums">${posStr}</div>
+        </div>`;
+    }).join('');
 }
 
 // ═══════════════════════════════════════════════════════
