@@ -8,6 +8,8 @@
     <meta property="og:title" content="F1XP — The Official Unofficial Home of F1 Predictions">
     <meta property="og:description" content="Data-driven F1 expected points model. Like xG in football, but for Formula 1.">
     <meta property="og:type" content="website">
+    <!-- #19: Canonical link -->
+    <link rel="canonical" href="https://f1xp.vercel.app/">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -32,16 +34,30 @@
         }
         .fade-in { animation: fadeIn 0.35s ease forwards; }
 
-        .prev-race-body { display: none; }
-        .prev-race-body.open { display: block; }
+        .prev-race-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .prev-race-body.open { max-height: 2000px; }
 
         .trend-up   { color: #22c55e; }
         .trend-down { color: #ef4444; }
         .trend-same { color: #94a3b8; }
 
-        .f1xp-score-bar {
-            transition: width 0.7s ease;
+        .f1xp-score-bar { transition: width 0.7s ease; }
+
+        /* #15: Focus-visible styles for keyboard navigation */
+        *:focus-visible {
+            outline: 2px solid #8BBFBC;
+            outline-offset: 2px;
+            border-radius: 4px;
         }
+
+        /* #26: Driver detail expand */
+        .driver-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .driver-detail.open { max-height: 500px; }
+
+        /* #25: Calendar highlight */
+        .calendar-round.completed { opacity: 1; }
+        .calendar-round.upcoming { opacity: 0.6; }
+        .calendar-round.next { border: 2px solid #E07B6E; opacity: 1; }
     </style>
 
     <script>
@@ -72,12 +88,14 @@
                 <span class="bg-f1-coral text-white text-xs font-black px-1.5 py-0.5 rounded">F1</span>
                 <span>XP</span>
             </a>
-            <span class="text-white/30 text-sm hidden sm:block">Season 2026</span>
+            <span class="text-white/40 text-sm hidden sm:block">Season 2026</span>
         </div>
         <div class="flex items-center gap-4 text-sm">
-            <span class="text-white/40 text-xs hidden sm:block">After Rd 2 · China</span>
+            <!-- #17: Improved contrast from /40 to /60 -->
+            <span class="text-white/60 text-xs hidden sm:block">After Rd 2 · China</span>
+            <!-- #12: Changed "Live" to "Updated" — no live data stream -->
             <span class="flex items-center gap-1.5 text-f1-teal font-semibold text-xs uppercase tracking-widest">
-                <span class="w-1.5 h-1.5 rounded-full bg-f1-teal animate-pulse"></span>Live
+                <span class="w-1.5 h-1.5 rounded-full bg-f1-teal"></span>Updated
             </span>
         </div>
     </div>
@@ -129,108 +147,158 @@
 <section class="bg-f1-cream py-12">
     <div class="max-w-7xl mx-auto px-4">
 
-        <!-- Tab bar -->
-        <div class="flex gap-2 mb-8 bg-white rounded-2xl p-1.5 w-fit border border-f1-dark/10">
-            <button class="tab-btn active text-sm font-bold px-6 py-2.5 rounded-xl transition-all" data-tab="next">
+        <!-- #8: Tab bar with overflow-x-auto for small screens, #9: larger touch targets, #13: ARIA roles -->
+        <div class="flex gap-1 sm:gap-2 mb-8 bg-white rounded-2xl p-1.5 w-fit max-w-full overflow-x-auto border border-f1-dark/10" role="tablist" aria-label="Main navigation">
+            <button class="tab-btn active text-sm font-bold px-4 sm:px-6 py-3 rounded-xl transition-all whitespace-nowrap" data-tab="next" role="tab" aria-selected="true" aria-controls="tab-next">
                 Next Race
             </button>
-            <button class="tab-btn text-sm font-semibold px-6 py-2.5 rounded-xl text-f1-muted hover:text-f1-dark transition-all" data-tab="previous">
+            <button class="tab-btn text-sm font-semibold px-4 sm:px-6 py-3 rounded-xl text-f1-muted hover:text-f1-dark transition-all whitespace-nowrap" data-tab="previous" role="tab" aria-selected="false" aria-controls="tab-previous">
                 Previous Races
             </button>
-            <button class="tab-btn text-sm font-semibold px-6 py-2.5 rounded-xl text-f1-muted hover:text-f1-dark transition-all" data-tab="championship">
+            <button class="tab-btn text-sm font-semibold px-4 sm:px-6 py-3 rounded-xl text-f1-muted hover:text-f1-dark transition-all whitespace-nowrap" data-tab="championship" role="tab" aria-selected="false" aria-controls="tab-championship">
                 Championship
+            </button>
+            <button class="tab-btn text-sm font-semibold px-4 sm:px-6 py-3 rounded-xl text-f1-muted hover:text-f1-dark transition-all whitespace-nowrap" data-tab="calendar" role="tab" aria-selected="false" aria-controls="tab-calendar">
+                Calendar
             </button>
         </div>
 
         <!-- ─── NEXT RACE ─── -->
-        <div id="tab-next" class="tab-pane active fade-in">
-            <div class="bg-f1-dark text-white rounded-2xl p-6 mb-5 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+        <div id="tab-next" class="tab-pane active fade-in" role="tabpanel">
+            <div class="bg-f1-dark text-white rounded-2xl p-4 sm:p-6 mb-5 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
                 <div class="text-5xl">🇯🇵</div>
                 <div class="flex-1">
-                    <p class="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">Round 3 · 2026</p>
+                    <!-- #17: Improved contrast -->
+                    <p class="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">Round 3 · 2026</p>
                     <h2 class="text-2xl font-black tracking-tight">Japanese Grand Prix</h2>
                     <p class="text-white/60 text-sm mt-1">Suzuka International Racing Course · 53 laps · 5.807 km</p>
                 </div>
-                <div class="flex gap-6 md:gap-8 flex-wrap">
+                <div class="flex gap-4 sm:gap-6 md:gap-8 flex-wrap">
+                    <!-- #30: Countdown timer -->
                     <div class="text-center">
-                        <div class="text-xs text-white/50 uppercase tracking-wide mb-1">Race Date</div>
-                        <div class="font-bold text-sm">6 Apr 2026</div>
+                        <div class="text-xs text-white/60 uppercase tracking-wide mb-1">Countdown</div>
+                        <div class="font-bold text-sm text-f1-coral" id="countdown-display">—</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-xs text-white/50 uppercase tracking-wide mb-1">Tyre Deg</div>
+                        <div class="text-xs text-white/60 uppercase tracking-wide mb-1">Tyre Deg</div>
                         <div class="font-bold text-sm text-yellow-400">High</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-xs text-white/50 uppercase tracking-wide mb-1">Weather</div>
+                        <div class="text-xs text-white/60 uppercase tracking-wide mb-1">Weather</div>
                         <div class="font-bold text-sm" id="weather-display">Loading…</div>
                     </div>
                 </div>
             </div>
 
+            <!-- #29: Share button -->
+            <div class="flex justify-end mb-3">
+                <button onclick="sharePreview()" class="text-xs text-f1-muted hover:text-f1-dark flex items-center gap-1.5 bg-white border border-f1-dark/10 px-3 py-2 rounded-lg transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                    Share predictions
+                </button>
+            </div>
 
             <div class="bg-white rounded-2xl overflow-hidden border border-f1-dark/8">
-                <div class="px-6 py-4 border-b border-f1-cream flex items-center justify-between">
+                <div class="px-4 sm:px-6 py-4 border-b border-f1-cream flex items-center justify-between">
                     <div>
                         <h3 class="font-black text-f1-dark text-lg">F1XP Pre-Race Predictions</h3>
                         <p class="text-f1-muted text-xs mt-0.5">Points each driver is expected to score — ranked by car pace, track fit &amp; conditions</p>
                     </div>
-                    <div class="text-xs text-f1-muted bg-f1-cream px-3 py-1.5 rounded-full font-semibold">Quali TBC</div>
+                    <!-- #28: Qualifying integration placeholder -->
+                    <div class="text-xs text-f1-muted bg-f1-cream px-3 py-1.5 rounded-full font-semibold" id="quali-badge">Quali TBC</div>
                 </div>
-                <div class="bg-yellow-50 border-b border-yellow-100 px-6 py-2 text-xs text-yellow-700 font-semibold flex items-center gap-2">
+                <div class="bg-yellow-50 border-b border-yellow-100 px-4 sm:px-6 py-2 text-xs text-yellow-700 font-semibold flex items-center gap-2" id="quali-warning">
                     <span>⚠</span> Qualifying not yet held — grid positions predicted from car pace model
                 </div>
-                <div class="grid grid-cols-12 gap-2 px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
+                <div class="grid grid-cols-12 gap-2 px-4 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
                     <div class="col-span-1 text-center">Pred</div>
                     <div class="col-span-8">Driver</div>
                     <div class="col-span-3 text-right">XP</div>
                 </div>
                 <div id="driver-grid" class="divide-y divide-f1-cream"></div>
             </div>
+
+            <!-- #27: Model transparency panel -->
+            <details class="mt-4 bg-white rounded-2xl border border-f1-dark/8 overflow-hidden">
+                <summary class="px-4 sm:px-6 py-4 cursor-pointer font-bold text-f1-dark text-sm flex items-center justify-between hover:bg-f1-cream/40">
+                    How does the F1XP model work?
+                    <span class="text-f1-muted text-xs">Click to expand</span>
+                </summary>
+                <div class="px-4 sm:px-6 py-4 border-t border-f1-cream text-sm text-f1-muted space-y-3">
+                    <p><strong class="text-f1-dark">Car Coefficient</strong> — Each team is rated on a 0–100 scale based on qualifying and race pace data, blended with pre-season priors. As the season progresses, real data dominates.</p>
+                    <p><strong class="text-f1-dark">Driver Rating</strong> — Based on EA F1 25 game ratings, compressed to ±3% of car pace. The car determines the band; driver talent is the tiebreaker.</p>
+                    <p><strong class="text-f1-dark">Safety Car Factor</strong> — Circuit-specific SC probability adjusts XP. Front-runners lose value under SC; midfield benefits.</p>
+                    <p><strong class="text-f1-dark">Weather Adjustment</strong> — Rain compresses the field, reducing front-runner XP and boosting midfield drivers.</p>
+                    <p><strong class="text-f1-dark">Reliability Factor</strong> — Teams with weaker infrastructure face a small DNF probability, reducing their expected points.</p>
+                    <p><strong class="text-f1-dark">Fastest Lap Bonus</strong> — Top-10 finishers have a chance at the +1 FL bonus, weighted by car pace.</p>
+                    <div id="model-weights" class="mt-3 p-3 bg-f1-cream rounded-xl text-xs"></div>
+                </div>
+            </details>
         </div>
 
         <!-- ─── PREVIOUS RACES ─── -->
-        <div id="tab-previous" class="tab-pane fade-in">
+        <div id="tab-previous" class="tab-pane fade-in" role="tabpanel">
             <div class="space-y-4" id="previous-races-list"></div>
         </div>
 
         <!-- ─── CHAMPIONSHIP ─── -->
-        <div id="tab-championship" class="tab-pane fade-in">
-            <div class="flex gap-2 mb-6">
-                <button class="champ-tab-btn text-sm font-bold px-5 py-2 rounded-xl bg-f1-dark text-white" data-champ="drivers">Drivers</button>
-                <button class="champ-tab-btn text-sm font-semibold px-5 py-2 rounded-xl bg-white text-f1-muted border border-f1-dark/10 hover:text-f1-dark" data-champ="constructors">Constructors</button>
+        <div id="tab-championship" class="tab-pane fade-in" role="tabpanel">
+            <div class="flex gap-2 mb-6" role="tablist" aria-label="Championship type">
+                <!-- #9: Larger touch targets py-2.5 -->
+                <button class="champ-tab-btn text-sm font-bold px-5 py-2.5 rounded-xl bg-f1-dark text-white" data-champ="drivers" role="tab" aria-selected="true">Drivers</button>
+                <button class="champ-tab-btn text-sm font-semibold px-5 py-2.5 rounded-xl bg-white text-f1-muted border border-f1-dark/10 hover:text-f1-dark" data-champ="constructors" role="tab" aria-selected="false">Constructors</button>
             </div>
 
             <div id="champ-drivers" class="bg-white rounded-2xl overflow-hidden border border-f1-dark/8">
-                <div class="px-6 py-4 border-b border-f1-cream">
-                    <h3 class="font-black text-f1-dark text-lg">2026 Driver Championship</h3>
-                    <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China · Actual pts vs F1XP accumulated expected pts</p>
+                <div class="px-4 sm:px-6 py-4 border-b border-f1-cream flex items-center justify-between">
+                    <div>
+                        <h3 class="font-black text-f1-dark text-lg">2026 Driver Championship</h3>
+                        <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China · Actual pts vs F1XP accumulated expected pts</p>
+                    </div>
+                    <!-- #29: Share -->
+                    <button onclick="shareChampionship()" class="text-f1-muted hover:text-f1-dark p-2 rounded-lg transition-colors" title="Share standings">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                    </button>
                 </div>
-                <div class="grid grid-cols-12 gap-2 px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
+                <!-- #1/#7: Responsive grid — hide XP & ΔXP on mobile -->
+                <div class="grid grid-cols-8 sm:grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
                     <div class="col-span-1">#</div>
                     <div class="col-span-3">Driver</div>
-                    <div class="col-span-2 text-right">Pts</div>
-                    <div class="col-span-1 text-right">XP</div>
-                    <div class="col-span-1 text-right">Δ XP</div>
-                    <div class="col-span-2 text-right">Exp. Champ</div>
+                    <div class="col-span-1 sm:col-span-2 text-right">Pts</div>
+                    <div class="hidden sm:block sm:col-span-1 text-right">XP</div>
+                    <div class="hidden sm:block sm:col-span-1 text-right">Δ XP</div>
+                    <div class="col-span-1 sm:col-span-2 text-right text-[10px] sm:text-xs leading-tight">Exp.</div>
                     <div class="col-span-2 text-right">Δ Pos</div>
                 </div>
                 <div id="driver-standings" class="divide-y divide-f1-cream"></div>
             </div>
 
-            <div id="champ-constructors" class="hidden bg-white rounded-2xl overflow-hidden border border-f1-dark/8">
-                <div class="px-6 py-4 border-b border-f1-cream">
+            <div id="champ-constructors" class="hidden bg-white rounded-2xl overflow-hidden border border-f1-dark/8 mt-4">
+                <div class="px-4 sm:px-6 py-4 border-b border-f1-cream">
                     <h3 class="font-black text-f1-dark text-lg">2026 Constructor Championship</h3>
                     <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China</p>
                 </div>
-                <div class="grid grid-cols-12 gap-2 px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
+                <!-- #7: Responsive constructor grid -->
+                <div class="grid grid-cols-8 sm:grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
                     <div class="col-span-1">#</div>
                     <div class="col-span-3">Constructor</div>
-                    <div class="col-span-2 text-right">Pts</div>
-                    <div class="col-span-2 text-right">XP</div>
-                    <div class="col-span-2 text-right">Exp. Champ</div>
+                    <div class="col-span-1 sm:col-span-2 text-right">Pts</div>
+                    <div class="hidden sm:block sm:col-span-2 text-right">XP</div>
+                    <div class="col-span-1 sm:col-span-2 text-right text-[10px] sm:text-xs leading-tight">Exp.</div>
                     <div class="col-span-2 text-right">Δ Pos</div>
                 </div>
                 <div id="constructor-standings" class="divide-y divide-f1-cream"></div>
+            </div>
+        </div>
+
+        <!-- #25: SEASON CALENDAR -->
+        <div id="tab-calendar" class="tab-pane fade-in" role="tabpanel">
+            <div class="bg-white rounded-2xl overflow-hidden border border-f1-dark/8">
+                <div class="px-4 sm:px-6 py-4 border-b border-f1-cream">
+                    <h3 class="font-black text-f1-dark text-lg">2026 Season Calendar</h3>
+                    <p class="text-f1-muted text-xs mt-0.5">24 rounds · March to December</p>
+                </div>
+                <div id="season-calendar" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0"></div>
             </div>
         </div>
 
@@ -238,46 +306,61 @@
 </section>
 
 <!-- ── CORAL CALLOUT ── -->
+<!-- #16: Improved contrast — changed bg to darker coral, text to full white -->
 <section class="bg-f1-coral py-16">
     <div class="max-w-7xl mx-auto px-4 text-center">
         <h2 class="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">What does F1XP tell us?</h2>
-        <p class="text-white/80 text-lg max-w-2xl mx-auto leading-relaxed">
+        <p class="text-white text-lg max-w-2xl mx-auto leading-relaxed">
             If a driver consistently outperforms their F1XP, they're beating the model — whether through brilliance, luck, or circumstances the model hasn't yet accounted for. Over a season, the gap between F1XP and real points is the most honest measure of performance.
         </p>
+        <!-- #33: Race-by-race model evolution -->
+        <div class="mt-6 text-white/90 text-sm font-semibold" id="model-evolution-summary"></div>
         <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            <div class="bg-white/15 rounded-2xl p-6 text-white">
+            <div class="bg-white/20 rounded-2xl p-6 text-white">
                 <div class="text-3xl font-black mb-2" id="stat-overperformer">—</div>
-                <div class="text-sm text-white/70 font-semibold">Biggest overperformer<br>vs model so far</div>
+                <div class="text-sm text-white/90 font-semibold">Biggest overperformer<br>vs model so far</div>
             </div>
-            <div class="bg-white/15 rounded-2xl p-6 text-white">
+            <div class="bg-white/20 rounded-2xl p-6 text-white">
                 <div class="text-3xl font-black mb-2" id="stat-underperformer">—</div>
-                <div class="text-sm text-white/70 font-semibold">Biggest underperformer<br>vs model so far</div>
+                <div class="text-sm text-white/90 font-semibold">Biggest underperformer<br>vs model so far</div>
             </div>
-            <div class="bg-white/15 rounded-2xl p-6 text-white">
+            <div class="bg-white/20 rounded-2xl p-6 text-white">
                 <div class="text-3xl font-black mb-2" id="stat-accuracy">—</div>
-                <div class="text-sm text-white/70 font-semibold">Top-5 prediction<br>accuracy (Rd 1)</div>
+                <div class="text-sm text-white/90 font-semibold">Top-5 prediction<br>accuracy overall</div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- ── FOOTER ── -->
-<footer class="bg-f1-dark text-white/50 py-10">
+<!-- #17: Improved footer contrast -->
+<footer class="bg-f1-dark text-white/60 py-10">
     <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
         <div class="flex items-center gap-2">
             <span class="bg-f1-coral text-white text-xs font-black px-1.5 py-0.5 rounded">F1</span>
             <span class="font-bold text-white">XP</span>
-            <span class="text-white/30">· 2026 Season</span>
+            <span class="text-white/40">· 2026 Season</span>
         </div>
-        <p class="text-center text-xs leading-relaxed max-w-sm text-white/40">
+        <p class="text-center text-xs leading-relaxed max-w-sm text-white/50">
             F1XP is a fan project. Not affiliated with Formula 1, FIA, or any constructor. Live weather via Open-Meteo.
         </p>
-        <div class="text-xs text-white/30">Rounds 1–2 complete · Round 3 next</div>
+        <div class="text-xs text-white/40">Rounds 1–2 complete · Round 3 next</div>
     </div>
 </footer>
 
 <script>
 'use strict';
+
+// ═══════════════════════════════════════════════════════
+//  NEXT RACE CONFIG (#4, #5: No more hardcoded values)
+// ═══════════════════════════════════════════════════════
+const NEXT_RACE = {
+    round: 3,
+    name: 'Japanese Grand Prix',
+    circuitId: 'suzuka',
+    date: '2026-04-06',
+    raceDate: new Date('2026-04-06T14:00:00+09:00'),
+};
 
 const TEAMS = {
     mclaren:      { name: 'McLaren',       color: '#FF8000' },
@@ -295,55 +378,60 @@ const TEAMS = {
 
 // Driver headshots & team logos from Wikimedia Commons
 const DRIVER_IMGS = {
-    rus: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg/330px-KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg",
-    ant: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Kimi_Antonelli_at_the_2025_US_Grand_Prix_in_Austin%2C_TX_%28cropped%29.jpg/330px-Kimi_Antonelli_at_the_2025_US_Grand_Prix_in_Austin%2C_TX_%28cropped%29.jpg",
-    lec: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3978_by_Stepro_%28cropped2%29.jpg/330px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3978_by_Stepro_%28cropped2%29.jpg",
-    ham: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg/330px-Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg",
-    nor: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg/330px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg",
-    pia: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg/330px-2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg",
-    ver: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg/330px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg",
-    had: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Isack_Hadjar_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8753%29_%28cropped%29.jpg/330px-Isack_Hadjar_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8753%29_%28cropped%29.jpg",
-    law: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Liam_Lawson_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7793%29.jpg/330px-Liam_Lawson_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7793%29.jpg",
-    lin: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Arvid_Lindblad_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7869%29_%28cropped%29.jpg/330px-Arvid_Lindblad_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7869%29_%28cropped%29.jpg",
-    alo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Alonso-68_%2824710447098%29.jpg/330px-Alonso-68_%2824710447098%29.jpg",
-    str: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/2025_Japan_GP_-_Aston_Martin_-_Lance_Stroll_-_Fanzone_Stage_%28cropped%29.jpg/330px-2025_Japan_GP_-_Aston_Martin_-_Lance_Stroll_-_Fanzone_Stage_%28cropped%29.jpg",
-    alb: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Alex_Albon_%28cropped%29.jpg/250px-Alex_Albon_%28cropped%29.jpg",
-    sai: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg/330px-Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg",
-    ocon: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Esteban_Ocon_2024_Suzuka_%28cropped%29.jpg/330px-Esteban_Ocon_2024_Suzuka_%28cropped%29.jpg",
-    bea: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/2025_Japan_GP_-_Haas_-_Oliver_Bearman_-_Thursday_%28cropped%29.jpg/330px-2025_Japan_GP_-_Haas_-_Oliver_Bearman_-_Thursday_%28cropped%29.jpg",
-    gas: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/2022_French_Grand_Prix_%2852279065728%29_%28midcrop%29.png/330px-2022_French_Grand_Prix_%2852279065728%29_%28midcrop%29.png",
-    col: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Franco_Colapinto_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8704%29_%28cropped%29.jpg/330px-Franco_Colapinto_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8704%29_%28cropped%29.jpg",
-    hul: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Nico_Hulkenberg_2016_Malaysia.jpg/330px-Nico_Hulkenberg_2016_Malaysia.jpg",
-    bor: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gabriel_Bortoleto_%28cropped%29.jpg/330px-Gabriel_Bortoleto_%28cropped%29.jpg",
-    per: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/2021_US_GP_driver_parade_%28cropped2%29.jpg/330px-2021_US_GP_driver_parade_%28cropped2%29.jpg",
-    bot: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Valtteri_Bottas_at_the_2026_Adelaide_Motorsport_Festival_%28028A7567%29.jpg/330px-Valtteri_Bottas_at_the_2026_Adelaide_Motorsport_Festival_%28028A7567%29.jpg",
+    rus: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg/100px-KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg",
+    ant: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Kimi_Antonelli_at_the_2025_US_Grand_Prix_in_Austin%2C_TX_%28cropped%29.jpg/100px-Kimi_Antonelli_at_the_2025_US_Grand_Prix_in_Austin%2C_TX_%28cropped%29.jpg",
+    lec: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3978_by_Stepro_%28cropped2%29.jpg/100px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3978_by_Stepro_%28cropped2%29.jpg",
+    ham: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg/100px-Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg",
+    nor: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg/100px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg",
+    pia: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg/100px-2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg",
+    ver: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg/100px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg",
+    had: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Isack_Hadjar_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8753%29_%28cropped%29.jpg/100px-Isack_Hadjar_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8753%29_%28cropped%29.jpg",
+    law: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Liam_Lawson_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7793%29.jpg/100px-Liam_Lawson_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7793%29.jpg",
+    lin: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Arvid_Lindblad_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7869%29_%28cropped%29.jpg/100px-Arvid_Lindblad_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7869%29_%28cropped%29.jpg",
+    alo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Alonso-68_%2824710447098%29.jpg/100px-Alonso-68_%2824710447098%29.jpg",
+    str: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/2025_Japan_GP_-_Aston_Martin_-_Lance_Stroll_-_Fanzone_Stage_%28cropped%29.jpg/100px-2025_Japan_GP_-_Aston_Martin_-_Lance_Stroll_-_Fanzone_Stage_%28cropped%29.jpg",
+    alb: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Alex_Albon_%28cropped%29.jpg/100px-Alex_Albon_%28cropped%29.jpg",
+    sai: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg/100px-Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg",
+    ocon: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Esteban_Ocon_2024_Suzuka_%28cropped%29.jpg/100px-Esteban_Ocon_2024_Suzuka_%28cropped%29.jpg",
+    bea: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/2025_Japan_GP_-_Haas_-_Oliver_Bearman_-_Thursday_%28cropped%29.jpg/100px-2025_Japan_GP_-_Haas_-_Oliver_Bearman_-_Thursday_%28cropped%29.jpg",
+    gas: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/2022_French_Grand_Prix_%2852279065728%29_%28midcrop%29.png/100px-2022_French_Grand_Prix_%2852279065728%29_%28midcrop%29.png",
+    col: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Franco_Colapinto_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8704%29_%28cropped%29.jpg/100px-Franco_Colapinto_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8704%29_%28cropped%29.jpg",
+    hul: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Nico_Hulkenberg_2016_Malaysia.jpg/100px-Nico_Hulkenberg_2016_Malaysia.jpg",
+    bor: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gabriel_Bortoleto_%28cropped%29.jpg/100px-Gabriel_Bortoleto_%28cropped%29.jpg",
+    per: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/2021_US_GP_driver_parade_%28cropped2%29.jpg/100px-2021_US_GP_driver_parade_%28cropped2%29.jpg",
+    bot: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Valtteri_Bottas_at_the_2026_Adelaide_Motorsport_Festival_%28028A7567%29.jpg/100px-Valtteri_Bottas_at_the_2026_Adelaide_Motorsport_Festival_%28028A7567%29.jpg",
 };
 const TEAM_IMGS = {
-    mercedes:     "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Mercedes-AMG_Petronas_F1_Team_logo_%282026%29.svg/250px-Mercedes-AMG_Petronas_F1_Team_logo_%282026%29.svg.png",
-    ferrari:      "https://upload.wikimedia.org/wikipedia/en/thumb/d/df/Scuderia_Ferrari_HP_logo_24.svg/250px-Scuderia_Ferrari_HP_logo_24.svg.png",
-    mclaren:      "https://upload.wikimedia.org/wikipedia/en/thumb/6/66/McLaren_Racing_logo.svg/250px-McLaren_Racing_logo.svg.png",
-    red_bull:     "https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Red_Bull_Racing_Logo_2026.svg/250px-Red_Bull_Racing_Logo_2026.svg.png",
-    racing_bulls: "https://upload.wikimedia.org/wikipedia/en/thumb/2/2b/VCARB_F1_logo.svg/250px-VCARB_F1_logo.svg.png",
-    aston_martin: "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/Aston_Martin_Aramco_2024_logo.png/250px-Aston_Martin_Aramco_2024_logo.png",
-    williams:     "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Atlassian_Williams_F1_Team_logo.svg/330px-Atlassian_Williams_F1_Team_logo.svg.png",
-    haas:         "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/TGR_Haas_F1_Team_Logo_%282026%29.svg/330px-TGR_Haas_F1_Team_Logo_%282026%29.svg.png",
-    alpine:       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/BWT_Alpine_F1_Team_Logo.png/330px-BWT_Alpine_F1_Team_Logo.png",
-    audi:         "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Audif1.com_logo17_%28cropped%29.svg/250px-Audif1.com_logo17_%28cropped%29.svg.png",
-    cadillac:     "https://upload.wikimedia.org/wikipedia/en/thumb/b/bc/Cadillac_Formula_1_Team_Logo_%282025%29.svg/250px-Cadillac_Formula_1_Team_Logo_%282025%29.svg.png",
+    mercedes:     "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Mercedes-AMG_Petronas_F1_Team_logo_%282026%29.svg/100px-Mercedes-AMG_Petronas_F1_Team_logo_%282026%29.svg.png",
+    ferrari:      "https://upload.wikimedia.org/wikipedia/en/thumb/d/df/Scuderia_Ferrari_HP_logo_24.svg/100px-Scuderia_Ferrari_HP_logo_24.svg.png",
+    mclaren:      "https://upload.wikimedia.org/wikipedia/en/thumb/6/66/McLaren_Racing_logo.svg/100px-McLaren_Racing_logo.svg.png",
+    red_bull:     "https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Red_Bull_Racing_Logo_2026.svg/100px-Red_Bull_Racing_Logo_2026.svg.png",
+    racing_bulls: "https://upload.wikimedia.org/wikipedia/en/thumb/2/2b/VCARB_F1_logo.svg/100px-VCARB_F1_logo.svg.png",
+    aston_martin: "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/Aston_Martin_Aramco_2024_logo.png/100px-Aston_Martin_Aramco_2024_logo.png",
+    williams:     "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Atlassian_Williams_F1_Team_logo.svg/100px-Atlassian_Williams_F1_Team_logo.svg.png",
+    haas:         "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/TGR_Haas_F1_Team_Logo_%282026%29.svg/100px-TGR_Haas_F1_Team_Logo_%282026%29.svg.png",
+    alpine:       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/BWT_Alpine_F1_Team_Logo.png/100px-BWT_Alpine_F1_Team_Logo.png",
+    audi:         "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Audif1.com_logo17_%28cropped%29.svg/100px-Audif1.com_logo17_%28cropped%29.svg.png",
+    cadillac:     "https://upload.wikimedia.org/wikipedia/en/thumb/b/bc/Cadillac_Formula_1_Team_Logo_%282025%29.svg/100px-Cadillac_Formula_1_Team_Logo_%282025%29.svg.png",
 };
+
+// #18: Descriptive alt text + #22: lazy loading
 function driverAvatar(id, teamColor, size='w-8 h-8') {
     const src = DRIVER_IMGS[id];
-    const initials = (DRIVERS.find(d=>d.id===id)?.name||'').split(' ').map(w=>w[0]).join('').slice(0,2);
-    if (src) return `<img src="${src}" alt="" class="${size} rounded-full object-cover object-top flex-shrink-0" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><span class="${size} rounded-full flex-shrink-0 items-center justify-center text-xs font-bold text-white" style="background:${teamColor};display:none">${initials}</span>`;
+    const driver = DRIVERS.find(d=>d.id===id);
+    const name = driver?.name || '';
+    const initials = name.split(' ').map(w=>w?.[0]||'').join('').slice(0,2);
+    if (src) return `<img src="${src}" alt="${name}" loading="lazy" width="32" height="32" class="${size} rounded-full object-cover object-top flex-shrink-0" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><span class="${size} rounded-full flex-shrink-0 items-center justify-center text-xs font-bold text-white" style="background:${teamColor};display:none">${initials}</span>`;
     return `<span class="${size} rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white" style="background:${teamColor}">${initials}</span>`;
 }
 function teamLogo(teamKey, teamColor, h='h-5') {
     const src = TEAM_IMGS[teamKey];
-    if (src) return `<img src="${src}" alt="" class="${h} w-auto object-contain flex-shrink-0" onerror="this.style.display='none'">`;
+    const teamName = TEAMS[teamKey]?.name || teamKey;
+    if (src) return `<img src="${src}" alt="${teamName}" loading="lazy" class="${h} w-auto object-contain flex-shrink-0" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><span class="w-3 h-3 rounded-full flex-shrink-0" style="background:${teamColor};display:none"></span>`;
     return `<span class="w-3 h-3 rounded-full flex-shrink-0" style="background:${teamColor}"></span>`;
 }
 
-// f125 = EA F1 25 game driver rating (used for predicted grid + CarCoeff_prior team avg)
+// f125 = EA F1 25 game driver rating
 const DRIVERS = [
     { id:'nor', name:'Lando Norris',      abbr:'NOR', number:1,  team:'mclaren',      nationality:'🇬🇧', f125:95 },
     { id:'pia', name:'Oscar Piastri',     abbr:'PIA', number:81, team:'mclaren',      nationality:'🇦🇺', f125:85 },
@@ -377,72 +465,61 @@ const ACTUAL_POINTS = {
 
 // ═══════════════════════════════════════════════════════
 //  CAR COEFFICIENT MODEL
-//  CarCoeff_prior: 1 + γ*(team_avg_f125 − 80)/20, γ=0.12
-//  CarCoeff_data:  normalised from 2026 R1+R2 qualifying pace
-//  Blend: w_prior×prior + w_data×data, weights decay as data accumulates
 // ═══════════════════════════════════════════════════════
 
-// Pre-season car quality ranking (The Race pre-season assessment)
-// Normalised from 10-pt ratings → [0.85, 1.15] coefficient scale
 const TEAM_PRIOR_COEFF = {
-    mercedes:     1.150,  // 1st  9.5/10 — best new power unit, strongest in testing
-    ferrari:      1.123,  // 2nd  9.0/10 — topped timesheet in Barcelona testing
-    mclaren:      1.095,  // 3rd  8.5/10 — strong, stable carry-over from 2025
-    red_bull:     1.068,  // 4th  8.0/10 — Verstappen still elite but PU questions
-    haas:         1.014,  // 5th  7.0/10 — Toyota partnership benefit in testing
-    williams:     0.986,  // 6th  6.5/10 — solid but concerns about weight
-    audi:         0.959,  // 7th  6.0/10 — new entry, teething problems expected
-    racing_bulls: 0.932,  // 8th  5.5/10 — back-midfield, junior team resources
-    cadillac:     0.905,  // 9th  5.0/10 — new entry, adjusting to F1 pace
-    alpine:       0.877,  // 10th 4.5/10 — bottom in 2025; new Mercedes PU but unproven
-    aston_martin: 0.850,  // 11th 4.0/10 — technical issues throughout testing
+    mercedes:     1.150,
+    ferrari:      1.123,
+    mclaren:      1.095,
+    red_bull:     1.068,
+    haas:         1.014,
+    williams:     0.986,
+    audi:         0.959,
+    racing_bulls: 0.932,
+    cadillac:     0.905,
+    alpine:       0.877,
+    aston_martin: 0.850,
 };
 
-// 2026 live race pace data — rated from AUS+CHN results (97→1.141 scale: 0.85 + rating×0.003)
+// #3: Fixed — removed duplicate red_bull key
 const TEAM_DATA_COEFF = {
-    mercedes:     1.141,  // 97/100 — back-to-back 1-2s, utterly dominant
-    ferrari:      1.099,  // 83/100 — clearly second; exceptional starts, VSC error only blemish
-    haas:         1.054,  // 68/100 — season's biggest surprise; Bearman faster than Verstappen
-    mclaren:      1.036,  // 62/100 — reigning champs underperforming; double DNS masks real pace
-    red_bull:     0.994,  // 48/100 — Ford-RBP weakest new PU; Verstappen openly critical of regs
-    alpine:       1.024,  // 58/100 — Gasly scored both races; Mercedes PU performing well
-    racing_bulls: 1.018,  // 56/100 — Lindblad P8 AUS debut, Lawson P7 CHN; promising pair
-    red_bull:     0.994,  // 48/100 — Ford-RBP weakest new PU; Verstappen openly critical of regs
-    williams:     0.982,  // 44/100 — Sainz P9 CHN; Albon DNS CHN; quiet lower midfield
-    audi:         0.970,  // 40/100 — Bortoleto P9 AUS; Hülkenberg DNS both races
-    cadillac:     0.925,  // 25/100 — new entry, no points yet; infrastructure still ramping
-    aston_martin: 0.910,  // 20/100 — worst on grid; only team without excuse for zero points
+    mercedes:     1.141,
+    ferrari:      1.099,
+    haas:         1.054,
+    mclaren:      1.036,
+    alpine:       1.024,
+    racing_bulls: 1.018,
+    red_bull:     0.994,
+    williams:     0.982,
+    audi:         0.970,
+    cadillac:     0.925,
+    aston_martin: 0.910,
 };
 
-// Development potential: how quickly each team's car improves race-to-race.
-// Drives the speed at which the model converges from prior → live data.
-// Correlated with: constructor budget, technical staff depth, wind tunnel time.
 const DEV_POTENTIAL = {
-    mercedes:     1.00,  // Max budget, peak infrastructure
-    ferrari:      1.00,  // Max budget, long F1 heritage
-    mclaren:      1.00,  // Post-2023 resurgence, top-tier ops
-    red_bull:     0.95,  // Max budget but power unit transition headwind
-    aston_martin: 0.92,  // Heavy Stroll investment; growing fast
-    williams:     0.85,  // Andretti-backed revival; improving year-on-year
-    alpine:       0.85,  // Renault Group + Mercedes PU; mid-tier dev
-    audi:         0.83,  // VW Group funding but learning curve as new entry
-    racing_bulls: 0.82,  // Junior team — capped dev vs senior Red Bull
-    haas:         0.80,  // Leanest operation; Ferrari customer advantages limited
-    cadillac:     0.78,  // New entry — infrastructure still ramping up
+    mercedes: 1.00, ferrari: 1.00, mclaren: 1.00, red_bull: 0.95,
+    aston_martin: 0.92, williams: 0.85, alpine: 0.85, audi: 0.83,
+    racing_bulls: 0.82, haas: 0.80, cadillac: 0.78,
+};
+
+// #31: Reliability factor — probability of finishing the race
+const RELIABILITY = {
+    mercedes: 0.97, ferrari: 0.96, mclaren: 0.94, red_bull: 0.95,
+    haas: 0.93, alpine: 0.93, racing_bulls: 0.92, williams: 0.92,
+    audi: 0.90, aston_martin: 0.91, cadillac: 0.88,
 };
 
 function blendWeights(raceNum) {
-    if (raceNum <= 0)  return [1.00, 0.00]; // pre-season: prior only
-    if (raceNum <= 2)  return [0.55, 0.45]; // R1–R2: prior-leaning
-    if (raceNum <= 5)  return [0.20, 0.80]; // R3–R5: data dominant
-    if (raceNum <= 12) return [0.07, 0.93]; // R6–R12: near-pure data
-    return [0.03, 0.97];                    // R13+:  pure data
+    if (raceNum <= 0)  return [1.00, 0.00];
+    if (raceNum <= 2)  return [0.55, 0.45];
+    if (raceNum <= 5)  return [0.20, 0.80];
+    if (raceNum <= 12) return [0.07, 0.93];
+    return [0.03, 0.97];
 }
 
 function carCoeff(team, raceNum) {
     const [wp, wd] = blendWeights(raceNum);
     const dev = DEV_POTENTIAL[team] ?? 0.82;
-    // Well-resourced teams converge to live data faster; scale wd by dev potential
     const wdEff = Math.min(wd * (0.55 + 0.45 * dev), 0.98);
     const wpEff = 1 - wdEff;
     return wpEff * TEAM_PRIOR_COEFF[team] + wdEff * TEAM_DATA_COEFF[team];
@@ -455,7 +532,6 @@ function carCoeff(team, raceNum) {
 const PTS_TABLE        = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
 const SPRINT_PTS_TABLE = [8,  7,  6,  5,  4,  3, 2, 1];
 
-// SC benefit/penalty by grid position (empirical; positive = gains from SC)
 const SC_DELTA = [null,
     -0.15,-0.10,-0.05, 0.00, 0.05, 0.08, 0.10, 0.12, 0.12, 0.10,
      0.08, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.03, 0.03, 0.02, 0.02, 0.02];
@@ -472,8 +548,6 @@ function genericCIHalf(stickiness) {
 }
 
 const CIRCUITS = {
-    // Suzuka BaseXP from actual 2022–2025 results, Dirichlet-smoothed (k=0.1)
-    // Wide CI on P3/P5 due to DNF outliers in small sample
     suzuka: {
         name:'Suzuka', lat:34.8431, lon:136.5407, stickiness:0.85, sc_prob:0.42,
         baseXP:[null, 18.5,12.7,8.8,11.2,6.7,6.7,5.4,6.4,4.4,2.9,
@@ -493,7 +567,7 @@ const CIRCUITS = {
 
 // ═══════════════════════════════════════════════════════
 //  CORE XP ENGINE
-//  XP = BaseXP(grid, circuit) × CarCoeff(team, raceNum) × SC_adj(grid) × Weather_adj
+//  #31: Added reliability, #32: Added fastest lap bonus
 // ═══════════════════════════════════════════════════════
 
 function scAdj(gridPos, sc_prob) {
@@ -503,25 +577,39 @@ function scAdj(gridPos, sc_prob) {
 
 function weatherAdj(gridPos, rainProb) {
     if (rainProb < 0.15) return 1.0;
-    // Rain compresses field: hurts P1-3, slightly hurts P4-5, helps P6-15
     const effect = gridPos <= 3 ? -0.30 : gridPos <= 5 ? -0.10 : gridPos <= 15 ? 0.20 : 0.05;
     return +(1 + (rainProb - 0.15) * effect).toFixed(4);
+}
+
+// #32: Fastest lap bonus — probability-weighted +1pt for top-10 finishers
+function fastestLapBonus(gridPos, team, raceNum) {
+    if (gridPos > 10) return 0;
+    const cc = carCoeff(team, raceNum);
+    const totalCC = Object.keys(TEAMS).reduce((s, t) => s + carCoeff(t, raceNum), 0);
+    const flProb = (cc / totalCC) * (10 / Math.min(gridPos + 2, 10));
+    return +(flProb * 1).toFixed(3); // Expected value of 1pt FL bonus
 }
 
 function calcXP(driver, gridPos, circuitId, rainProb, raceNum, isSprint) {
     gridPos = Math.max(1, Math.min(gridPos || 22, 22));
     const circ = CIRCUITS[circuitId];
     let bxp = circ.baseXP[gridPos] || 0;
-    if (isSprint) bxp = bxp * (8 / 25) * 1.1; // sprint: scale + slightly stickier
+    if (isSprint) bxp = bxp * (8 / 25) * 1.1;
 
     const cc  = carCoeff(driver.team, raceNum);
     const sc  = scAdj(gridPos, circ.sc_prob);
     const wx  = weatherAdj(gridPos, rainProb);
-    const xp  = bxp * cc * sc * wx;
+    const rel = RELIABILITY[driver.team] ?? 0.90; // #31
+    let xp  = bxp * cc * sc * wx * (isSprint ? 1 : rel);
+
+    // #32: Add fastest lap bonus for non-sprint
+    if (!isSprint && gridPos <= 10) {
+        xp += fastestLapBonus(gridPos, driver.team, raceNum);
+    }
 
     let ci = circ.ciHalf[gridPos] ?? (xp * 0.5);
     if (isSprint) ci *= (8 / 25);
-    ci *= cc; // wider CI for weak cars, narrower for dominant ones
+    ci *= cc;
 
     const maxPts = isSprint ? 8 : 25;
     return {
@@ -532,6 +620,7 @@ function calcXP(driver, gridPos, circuitId, rainProb, raceNum, isSprint) {
         cc:    +cc.toFixed(3),
         sc:    +sc.toFixed(3),
         wx:    +wx.toFixed(3),
+        rel:   +(rel).toFixed(2),
         inPoints: gridPos <= 10,
         predictedFinish: gridPos,
         finishRange: [Math.max(1, gridPos - 3), Math.min(22, gridPos + 4)],
@@ -539,7 +628,7 @@ function calcXP(driver, gridPos, circuitId, rainProb, raceNum, isSprint) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  HISTORICAL RACE DATA (with actual 2026 qualifying grids)
+//  HISTORICAL RACE DATA
 // ═══════════════════════════════════════════════════════
 
 const PAST_RACES = [
@@ -547,7 +636,6 @@ const PAST_RACES = [
         round:'2', name:'Chinese Grand Prix', circuit:'Shanghai International Circuit',
         circuitId:'shanghai', date:'15 Mar 2026', flag:'🇨🇳', type:'Race',
         raceNum:2, rainProb:0.05,
-        // Actual 2026 Chinese GP qualifying grid
         grid:{ ant:1,rus:2,ham:3,lec:4,pia:5,nor:6,gas:7,ver:8,had:9,bea:10,
                hul:11,col:12,ocon:13,law:14,lin:15,bor:16,sai:17,alb:18,
                alo:19,bot:20,str:21,per:22 },
@@ -578,7 +666,6 @@ const PAST_RACES = [
         round:'1', name:'Australian Grand Prix', circuit:'Albert Park Circuit',
         circuitId:'albert_park', date:'8 Mar 2026', flag:'🇦🇺', type:'Race',
         raceNum:0, rainProb:0.10,
-        // Actual 2026 Australian GP qualifying grid (VER/STR DNS → grid 20)
         grid:{ rus:1,ant:2,had:3,lec:4,pia:5,nor:6,ham:7,law:8,lin:9,bor:10,
                hul:11,bea:12,ocon:13,gas:14,alb:15,col:16,alo:17,per:18,bot:19,
                ver:20,str:20 },
@@ -596,9 +683,12 @@ const PAST_RACES = [
 ];
 
 // ═══════════════════════════════════════════════════════
-//  PREDICTED JAPAN GRID (car pace × driver qualifying ability)
-//  Used until actual qualifying results available
+//  PREDICTED GRID (#4: Derive raceNum from data)
 // ═══════════════════════════════════════════════════════
+
+function currentRaceNum() {
+    return PAST_RACES.filter(r => !r.isSprint).length + 1;
+}
 
 function buildPredictedGrid(raceNum) {
     return DRIVERS
@@ -608,15 +698,15 @@ function buildPredictedGrid(raceNum) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  RANKED XP — rank drivers by model score, assign points
-//  table values (P1→25, P2→18, … P10→1, P11+→0)
+//  RANKED XP — #23: Cached version
 // ═══════════════════════════════════════════════════════
 
+const _xpCache = new Map();
 function computeRankedXP(race) {
+    const key = `${race.round}-${race.raceNum}`;
+    if (_xpCache.has(key)) return _xpCache.get(key);
+
     const table = race.isSprint ? SPRINT_PTS_TABLE : PTS_TABLE;
-    // Rank by car pace model (qualiScore), same as predicted grid —
-    // deliberately ignores actual qualifying results so XP is a
-    // pre-qualifying prediction based on car quality alone.
     const scores = DRIVERS
         .map(d => ({
             id: d.id,
@@ -625,6 +715,7 @@ function computeRankedXP(race) {
         .sort((a, b) => b.score - a.score);
     const out = {};
     scores.forEach((s, i) => { out[s.id] = table[i] || 0; });
+    _xpCache.set(key, out);
     return out;
 }
 
@@ -642,7 +733,7 @@ function computeAccumulatedF1XP() {
 //  WEATHER
 // ═══════════════════════════════════════════════════════
 
-let RAIN_PROB = 0.15; // default for Japan
+let RAIN_PROB = 0.15;
 
 async function fetchWeather(lat, lon, dateStr) {
     try {
@@ -663,15 +754,28 @@ async function fetchWeather(lat, lon, dateStr) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  RENDER — NEXT RACE (Japan)
+//  #30: COUNTDOWN TIMER
+// ═══════════════════════════════════════════════════════
+
+function updateCountdown() {
+    const now = new Date();
+    const diff = NEXT_RACE.raceDate - now;
+    const el = document.getElementById('countdown-display');
+    if (!el) return;
+    if (diff <= 0) { el.textContent = 'Race day!'; return; }
+    const days = Math.floor(diff / 86400000);
+    const hrs  = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    el.textContent = days > 0 ? `${days}d ${hrs}h` : `${hrs}h ${mins}m`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER — NEXT RACE
 // ═══════════════════════════════════════════════════════
 
 function renderDriverGrid(rainProb) {
-    const raceNum = 3;
+    const raceNum = currentRaceNum(); // #4: derived
     const grid = buildPredictedGrid(raceNum);
-
-    // buildPredictedGrid already sorted by qualiScore (car × driver) descending.
-    // Assign points table directly from that ranking — no re-sort needed.
     grid.forEach((d, i) => { d.xpPts = PTS_TABLE[i] || 0; });
 
     const el = document.getElementById('driver-grid');
@@ -684,12 +788,12 @@ function renderDriverGrid(rainProb) {
                           d.xpPts >= 1  ? 'text-f1-dark font-semibold' : 'text-f1-muted/30 font-medium';
 
         return `
-        <div class="driver-row grid grid-cols-12 gap-2 px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''}">
+        <div class="driver-row grid grid-cols-12 gap-2 px-4 sm:px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''}">
             <div class="col-span-1 text-center text-sm ${rankStyle}">P${rank}</div>
-            <div class="col-span-8 flex items-center gap-2">
+            <div class="col-span-8 flex items-center gap-2 min-w-0">
                 ${driverAvatar(d.id, team.color)}
-                <div>
-                    <div class="font-bold text-f1-dark text-sm leading-tight">${d.name}</div>
+                <div class="min-w-0">
+                    <div class="font-bold text-f1-dark text-sm leading-tight truncate">${d.name}</div>
                     <div class="text-xs text-f1-muted">${team.name}</div>
                 </div>
             </div>
@@ -698,6 +802,13 @@ function renderDriverGrid(rainProb) {
             </div>
         </div>`;
     }).join('');
+
+    // #27: Model weights display
+    const mw = document.getElementById('model-weights');
+    if (mw) {
+        const [wp, wd] = blendWeights(raceNum);
+        mw.innerHTML = `<strong>Current blend (Rd ${raceNum}):</strong> Prior ${Math.round(wp*100)}% / Data ${Math.round(wd*100)}% · Reliability factor applied · FL bonus for top-10`;
+    }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -708,11 +819,7 @@ function renderPreviousRaces() {
     const el = document.getElementById('previous-races-list');
     el.innerHTML = PAST_RACES.map((race, ri) => {
         const isOpen = ri === 0;
-
-        // Ranked XP: model ranks all drivers → assigns points table
         const xpPts = computeRankedXP(race);
-
-        // Sort results by finishing position for display
         const sorted = [...race.results].sort((a, b) => a.pos - b.pos);
 
         const rows = sorted.map(r => {
@@ -727,10 +834,10 @@ function renderPreviousRaces() {
             const showDelta = r.pts > 0 || xp > 0;
 
             return `
-            <div class="grid grid-cols-12 gap-1 px-5 py-3 items-center hover:bg-f1-cream/40 transition-colors">
-                <div class="col-span-6 flex items-center gap-2">
+            <div class="grid grid-cols-12 gap-1 px-3 sm:px-5 py-3 items-center hover:bg-f1-cream/40 transition-colors">
+                <div class="col-span-6 flex items-center gap-2 min-w-0">
                     <div class="w-1 h-6 rounded-full flex-shrink-0" style="background:${team.color}"></div>
-                    <div class="font-bold text-f1-dark text-sm leading-tight">${driver.name}</div>
+                    <div class="font-bold text-f1-dark text-sm leading-tight truncate">${driver.name}</div>
                 </div>
                 <div class="col-span-2 text-right font-bold text-sm tabular-nums text-f1-teal-dark">${xp || '—'}</div>
                 <div class="col-span-2 text-right font-bold text-sm tabular-nums ${r.pts > 0 ? 'text-f1-dark' : 'text-f1-muted/30'}">${r.pts > 0 ? r.pts : '—'}</div>
@@ -738,7 +845,6 @@ function renderPreviousRaces() {
             </div>`;
         }).join('');
 
-        // Top-5 accuracy: how many of model's top-5 XP drivers actually finished top-5?
         const top5ByXP = Object.entries(xpPts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
         const top5Actual = sorted.filter(r => r.pts > 0).slice(0,5).map(r => r.id);
         const matchCount = top5ByXP.filter(id => top5Actual.includes(id)).length;
@@ -746,27 +852,28 @@ function renderPreviousRaces() {
         const typePill = race.type === 'Sprint'
             ? '<span class="ml-2 text-xs bg-f1-coral/20 text-f1-coral font-bold px-2 py-0.5 rounded-full">Sprint</span>' : '';
 
+        // #14: Added aria-expanded to accordion buttons
         return `
         <div class="rounded-2xl overflow-hidden border border-f1-dark/8 bg-white">
-            <button class="w-full bg-f1-dark text-white p-5 flex items-center justify-between" onclick="toggleRace(${ri})">
-                <div class="flex items-center gap-3 text-left">
-                    <span class="text-3xl">${race.flag}</span>
-                    <div>
-                        <p class="text-white/50 text-xs uppercase tracking-widest font-semibold mb-0.5">Round ${race.round} · ${race.date}</p>
-                        <h3 class="font-black text-base">${race.name}${typePill}</h3>
-                        <p class="text-white/40 text-xs">${race.circuit}</p>
+            <button class="w-full bg-f1-dark text-white p-4 sm:p-5 flex items-center justify-between" onclick="toggleRace(${ri})" aria-expanded="${isOpen}" aria-controls="race-body-${ri}">
+                <div class="flex items-center gap-3 text-left min-w-0">
+                    <span class="text-2xl sm:text-3xl flex-shrink-0">${race.flag}</span>
+                    <div class="min-w-0">
+                        <p class="text-white/60 text-xs uppercase tracking-widest font-semibold mb-0.5">Round ${race.round} · ${race.date}</p>
+                        <h3 class="font-black text-sm sm:text-base truncate">${race.name}${typePill}</h3>
+                        <p class="text-white/50 text-xs truncate">${race.circuit}</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 flex-shrink-0">
                     <div class="text-right hidden sm:block">
-                        <div class="text-xs text-white/50 uppercase tracking-wide mb-0.5">Top-5 accuracy</div>
+                        <div class="text-xs text-white/60 uppercase tracking-wide mb-0.5">Top-5 accuracy</div>
                         <div class="text-xl font-black text-f1-teal">${matchCount}/5</div>
                     </div>
-                    <span class="text-white/40 text-lg" id="chevron-${ri}">${isOpen ? '↑' : '↓'}</span>
+                    <span class="text-white/50 text-lg" id="chevron-${ri}">${isOpen ? '↑' : '↓'}</span>
                 </div>
             </button>
-            <div class="prev-race-body ${isOpen ? 'open' : ''}" id="race-body-${ri}">
-                <div class="grid grid-cols-12 gap-1 px-5 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
+            <div class="prev-race-body ${isOpen ? 'open' : ''}" id="race-body-${ri}" role="region">
+                <div class="grid grid-cols-12 gap-1 px-3 sm:px-5 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
                     <div class="col-span-6">Driver</div>
                     <div class="col-span-2 text-right">XP</div>
                     <div class="col-span-2 text-right">Actual</div>
@@ -781,37 +888,38 @@ function renderPreviousRaces() {
 function toggleRace(i) {
     const body = document.getElementById(`race-body-${i}`);
     const chev = document.getElementById(`chevron-${i}`);
+    const btn  = body.previousElementSibling;
     const open = body.classList.toggle('open');
     chev.textContent = open ? '↑' : '↓';
+    btn.setAttribute('aria-expanded', open); // #14
 }
 
 // ═══════════════════════════════════════════════════════
 //  RENDER — CHAMPIONSHIP
+//  #2: Fixed — use per-race raceNum for evolving model
 // ═══════════════════════════════════════════════════════
 
 function computeChampPositions() {
-    // Use current race number (3) so expected positions reflect what we know NOW
-    const currentRaceNum = PAST_RACES.filter(r => !r.isSprint).length + 1;
     const expSum = {}, expN = {};
-    PAST_RACES.filter(r => !r.isSprint).forEach(() => {
+    // #2: Use each race's own raceNum so positions evolve
+    PAST_RACES.filter(r => !r.isSprint).forEach(race => {
         [...DRIVERS]
-            .map(d => ({ id: d.id, score: carCoeff(d.team, currentRaceNum) * (1 + (d.f125 - 85) * 0.003) }))
+            .map(d => ({ id: d.id, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
             .sort((a, b) => b.score - a.score)
             .forEach((d, i) => { expSum[d.id] = (expSum[d.id] || 0) + i + 1; expN[d.id] = (expN[d.id] || 0) + 1; });
     });
-    // Sort by float avg then assign sequential 1-22 (no ties)
     const sorted = [...DRIVERS].sort((a, b) =>
         (expN[a.id] ? expSum[a.id] / expN[a.id] : 999) - (expN[b.id] ? expSum[b.id] / expN[b.id] : 999)
     );
     const expChampPos = {};
     sorted.forEach((d, i) => { expChampPos[d.id] = i + 1; });
 
-    // Constructor exp champ pos using current race number
+    // Constructor positions
     const teamExpSum = {}, teamExpN = {};
-    PAST_RACES.filter(r => !r.isSprint).forEach(() => {
+    PAST_RACES.filter(r => !r.isSprint).forEach(race => {
         const raceRanks = {};
         [...DRIVERS]
-            .map(d => ({ id: d.id, team: d.team, score: carCoeff(d.team, currentRaceNum) * (1 + (d.f125 - 85) * 0.003) }))
+            .map(d => ({ id: d.id, team: d.team, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
             .sort((a, b) => b.score - a.score)
             .forEach((d, i) => { raceRanks[d.id] = i + 1; });
         DRIVERS.forEach(d => {
@@ -839,6 +947,7 @@ function renderChampionship() {
         expChamp: expChampPos[d.id] || null,
     })).sort((a, b) => b.pts - a.pts);
 
+    // #1/#7: Responsive grid matching header
     document.getElementById('driver-standings').innerHTML = standings.map((s, i) => {
         const rank      = i + 1;
         const delta     = +(s.pts - s.xp).toFixed(1);
@@ -850,60 +959,74 @@ function renderChampionship() {
         const posGap    = s.expChamp != null ? s.expChamp - rank : null;
         const posColor  = posGap > 0 ? 'text-green-500 font-bold' : posGap < 0 ? 'text-red-400 font-bold' : 'text-f1-muted';
         const posStr    = posGap == null ? '—' : posGap === 0 ? '~0' : (posGap > 0 ? '+' : '') + posGap;
+
+        // #26: Driver detail — race-by-race breakdown
+        const raceBreakdown = PAST_RACES.map(race => {
+            const xp = computeRankedXP(race)[s.driver.id] || 0;
+            const actual = race.results.find(r => r.id === s.driver.id)?.pts || 0;
+            const d = actual - xp;
+            const col = d > 0 ? 'text-green-500' : d < 0 ? 'text-red-400' : 'text-f1-muted';
+            return `<div class="flex justify-between py-1 text-xs"><span class="text-f1-muted">${race.flag} R${race.round}</span><span>XP ${xp}</span><span>Actual ${actual}</span><span class="${col} font-bold">${d > 0 ? '+' : ''}${d}</span></div>`;
+        }).join('');
+
         return `
-        <div class="champ-row grid grid-cols-12 gap-2 px-6 py-3.5 items-center transition-colors">
-            <div class="col-span-1 text-sm ${rankStyle}">${rank}</div>
-            <div class="col-span-3 flex items-center gap-2">
-                ${driverAvatar(s.driver.id, s.team.color)}
-                <div>
-                    <div class="font-bold text-sm text-f1-dark leading-tight">${s.driver.name}</div>
-                    <div class="text-xs text-f1-muted">${s.team.name}</div>
+        <div class="champ-row cursor-pointer" onclick="this.querySelector('.driver-detail').classList.toggle('open')">
+            <div class="grid grid-cols-8 sm:grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-3.5 items-center transition-colors">
+                <div class="col-span-1 text-sm ${rankStyle}">${rank}</div>
+                <div class="col-span-3 flex items-center gap-2 min-w-0">
+                    ${driverAvatar(s.driver.id, s.team.color)}
+                    <div class="min-w-0">
+                        <div class="font-bold text-sm text-f1-dark leading-tight truncate">${s.driver.name}</div>
+                        <div class="text-xs text-f1-muted">${s.team.name}</div>
+                    </div>
                 </div>
+                <div class="col-span-1 sm:col-span-2 text-right font-black text-f1-dark tabular-nums">${s.pts}</div>
+                <div class="hidden sm:block sm:col-span-1 text-right text-f1-muted text-sm tabular-nums">${s.xp}</div>
+                <div class="hidden sm:block sm:col-span-1 text-right text-xs ${deltaColor}">${deltaStr}</div>
+                <div class="col-span-1 sm:col-span-2 text-right text-sm text-f1-muted tabular-nums">${expStr}</div>
+                <div class="col-span-2 text-right text-sm ${posColor} tabular-nums">${posStr}</div>
             </div>
-            <div class="col-span-2 text-right font-black text-f1-dark tabular-nums">${s.pts}</div>
-            <div class="col-span-1 text-right text-f1-muted text-sm tabular-nums">${s.xp}</div>
-            <div class="col-span-1 text-right text-xs ${deltaColor}">${deltaStr}</div>
-            <div class="col-span-2 text-right text-sm text-f1-muted tabular-nums">${expStr}</div>
-            <div class="col-span-2 text-right text-sm ${posColor} tabular-nums">${posStr}</div>
+            <div class="driver-detail px-4 sm:px-6 bg-f1-cream/30 border-t border-f1-cream">
+                <div class="py-3 space-y-1">${raceBreakdown}</div>
+            </div>
         </div>`;
     }).join('');
 
-    // Constructor standings
+    // Constructor standings — #7: responsive grid
     const ctorMap = {};
     standings.forEach(s => {
         const t = s.driver.team;
-        if (!ctorMap[t]) ctorMap[t] = { team: TEAMS[t], pts: 0, xp: 0 };
+        if (!ctorMap[t]) ctorMap[t] = { key: t, team: TEAMS[t], pts: 0, xp: 0 };
         ctorMap[t].pts += s.pts;
         ctorMap[t].xp  += s.xp;
     });
     const ctors = Object.values(ctorMap).sort((a, b) => b.pts - a.pts);
     document.getElementById('constructor-standings').innerHTML = ctors.map((c, i) => {
         const rank   = i + 1;
-        const exp    = expCtorPos[Object.keys(TEAMS).find(k => TEAMS[k].name === c.team.name)] || null;
+        const exp    = expCtorPos[c.key] || null;
         const posGap = exp != null ? exp - rank : null;
         const posColor = posGap > 0 ? 'text-green-500 font-bold' : posGap < 0 ? 'text-red-400 font-bold' : 'text-f1-muted';
         const posStr = posGap == null ? '—' : posGap === 0 ? '~0' : (posGap > 0 ? '+' : '') + posGap;
         return `
-        <div class="champ-row grid grid-cols-12 gap-2 px-6 py-4 items-center transition-colors">
+        <div class="champ-row grid grid-cols-8 sm:grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-4 items-center transition-colors">
             <div class="col-span-1 text-sm font-semibold text-f1-muted">${rank}</div>
-            <div class="col-span-3 flex items-center gap-3">
-                ${teamLogo(Object.keys(TEAMS).find(k => TEAMS[k].name === c.team.name), c.team.color)}
+            <div class="col-span-3 flex items-center gap-2 sm:gap-3 min-w-0">
+                ${teamLogo(c.key, c.team.color)}
                 <span class="font-bold text-f1-dark truncate">${c.team.name}</span>
             </div>
-            <div class="col-span-2 text-right font-black text-f1-dark tabular-nums">${c.pts}</div>
-            <div class="col-span-2 text-right text-f1-muted font-semibold tabular-nums">${c.xp}</div>
-            <div class="col-span-2 text-right text-sm text-f1-muted tabular-nums">${exp != null ? 'P'+exp : '—'}</div>
+            <div class="col-span-1 sm:col-span-2 text-right font-black text-f1-dark tabular-nums">${c.pts}</div>
+            <div class="hidden sm:block sm:col-span-2 text-right text-f1-muted font-semibold tabular-nums">${c.xp}</div>
+            <div class="col-span-1 sm:col-span-2 text-right text-sm text-f1-muted tabular-nums">${exp != null ? 'P'+exp : '—'}</div>
             <div class="col-span-2 text-right text-sm ${posColor} tabular-nums">${posStr}</div>
         </div>`;
     }).join('');
 }
 
 // ═══════════════════════════════════════════════════════
-//  RENDER — CORAL STATS
+//  RENDER — CORAL STATS (#6: Use .find() instead of index)
 // ═══════════════════════════════════════════════════════
 
 function renderCoralStats() {
-    // Compute XP delta for every driver across all past races
     const totals = {};
     DRIVERS.forEach(d => { totals[d.id] = { driver: d, pts: ACTUAL_POINTS[d.id] || 0, xp: 0 }; });
     PAST_RACES.forEach(race => {
@@ -920,31 +1043,145 @@ function renderCoralStats() {
         if (delta < minDelta) { minDelta = delta; underDriver = t.driver; }
     });
 
-    // Top-5 accuracy from round 1 (AUS)
-    const r1 = PAST_RACES[2];
-    const r1XP = {};
-    DRIVERS.forEach(d => {
-        r1XP[d.id] = calcXP(d, r1.grid[d.id] || 22, r1.circuitId, r1.rainProb, r1.raceNum, false).xp;
+    // #6: Use .find() instead of hardcoded PAST_RACES[2]
+    const r1 = PAST_RACES.find(r => r.round === '1' && !r.isSprint);
+
+    // #33: Overall top-5 accuracy across all races
+    let totalCorrect = 0, totalRaces = 0;
+    PAST_RACES.forEach(race => {
+        const xpPts = computeRankedXP(race);
+        const top5XP = Object.entries(xpPts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
+        const sorted = [...race.results].sort((a,b)=>a.pos-b.pos);
+        const top5Actual = sorted.filter(r=>r.pts>0).slice(0,5).map(r=>r.id);
+        totalCorrect += top5XP.filter(id => top5Actual.includes(id)).length;
+        totalRaces++;
     });
-    const top5Pred   = Object.entries(r1XP).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
-    const top5Actual = r1.results.filter(r=>r.pts>0).slice(0,5).map(r=>r.id);
-    const acc = top5Pred.filter(id => top5Actual.includes(id)).length;
 
     if (overDriver)  document.getElementById('stat-overperformer').textContent = overDriver.abbr;
     if (underDriver) document.getElementById('stat-underperformer').textContent = underDriver.abbr;
-    document.getElementById('stat-accuracy').textContent = `${acc}/5`;
+    document.getElementById('stat-accuracy').textContent = `${totalCorrect}/${totalRaces * 5}`;
+
+    // #33: Model evolution summary
+    const evEl = document.getElementById('model-evolution-summary');
+    if (evEl) {
+        const pct = Math.round(totalCorrect / (totalRaces * 5) * 100);
+        evEl.textContent = `Model accuracy: ${pct}% of top-5 predictions correct across ${totalRaces} races`;
+    }
 }
 
 // ═══════════════════════════════════════════════════════
-//  TABS
+//  #25: SEASON CALENDAR
 // ═══════════════════════════════════════════════════════
+
+const CALENDAR_2026 = [
+    { rd:1,  name:'Australian GP',    loc:'Melbourne',     date:'8 Mar',  flag:'🇦🇺', completed:true },
+    { rd:2,  name:'Chinese GP',       loc:'Shanghai',      date:'15 Mar', flag:'🇨🇳', completed:true },
+    { rd:3,  name:'Japanese GP',      loc:'Suzuka',        date:'6 Apr',  flag:'🇯🇵', next:true },
+    { rd:4,  name:'Bahrain GP',       loc:'Sakhir',        date:'13 Apr', flag:'🇧🇭' },
+    { rd:5,  name:'Saudi Arabian GP', loc:'Jeddah',        date:'20 Apr', flag:'🇸🇦' },
+    { rd:6,  name:'Miami GP',         loc:'Miami',         date:'4 May',  flag:'🇺🇸' },
+    { rd:7,  name:'Emilia Romagna GP',loc:'Imola',         date:'18 May', flag:'🇮🇹' },
+    { rd:8,  name:'Monaco GP',        loc:'Monte Carlo',   date:'25 May', flag:'🇲🇨' },
+    { rd:9,  name:'Spanish GP',       loc:'Barcelona',     date:'1 Jun',  flag:'🇪🇸' },
+    { rd:10, name:'Canadian GP',      loc:'Montréal',      date:'15 Jun', flag:'🇨🇦' },
+    { rd:11, name:'Austrian GP',      loc:'Spielberg',     date:'29 Jun', flag:'🇦🇹' },
+    { rd:12, name:'British GP',       loc:'Silverstone',   date:'6 Jul',  flag:'🇬🇧' },
+    { rd:13, name:'Belgian GP',       loc:'Spa',           date:'27 Jul', flag:'🇧🇪' },
+    { rd:14, name:'Hungarian GP',     loc:'Budapest',      date:'3 Aug',  flag:'🇭🇺' },
+    { rd:15, name:'Dutch GP',         loc:'Zandvoort',     date:'31 Aug', flag:'🇳🇱' },
+    { rd:16, name:'Italian GP',       loc:'Monza',         date:'7 Sep',  flag:'🇮🇹' },
+    { rd:17, name:'Azerbaijan GP',    loc:'Baku',          date:'21 Sep', flag:'🇦🇿' },
+    { rd:18, name:'Singapore GP',     loc:'Marina Bay',    date:'5 Oct',  flag:'🇸🇬' },
+    { rd:19, name:'US GP',            loc:'Austin',        date:'19 Oct', flag:'🇺🇸' },
+    { rd:20, name:'Mexico City GP',   loc:'México City',   date:'26 Oct', flag:'🇲🇽' },
+    { rd:21, name:'São Paulo GP',     loc:'Interlagos',    date:'9 Nov',  flag:'🇧🇷' },
+    { rd:22, name:'Las Vegas GP',     loc:'Las Vegas',     date:'22 Nov', flag:'🇺🇸' },
+    { rd:23, name:'Qatar GP',         loc:'Lusail',        date:'30 Nov', flag:'🇶🇦' },
+    { rd:24, name:'Abu Dhabi GP',     loc:'Yas Marina',    date:'7 Dec',  flag:'🇦🇪' },
+];
+
+function renderCalendar() {
+    const el = document.getElementById('season-calendar');
+    if (!el) return;
+    el.innerHTML = CALENDAR_2026.map(r => {
+        const status = r.completed ? 'completed' : r.next ? 'next' : 'upcoming';
+        const badge = r.completed ? '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">Done</span>'
+                    : r.next ? '<span class="text-xs bg-f1-coral/20 text-f1-coral px-2 py-0.5 rounded-full font-bold">Next</span>'
+                    : '';
+        return `
+        <div class="calendar-round ${status} flex items-center gap-3 px-4 sm:px-6 py-3 border-b border-f1-cream hover:bg-f1-cream/40 transition-colors">
+            <span class="text-xl flex-shrink-0">${r.flag}</span>
+            <div class="flex-1 min-w-0">
+                <div class="font-bold text-f1-dark text-sm truncate">${r.name}</div>
+                <div class="text-xs text-f1-muted">${r.loc} · ${r.date}</div>
+            </div>
+            <div class="flex-shrink-0 text-right">
+                <div class="text-xs text-f1-muted font-semibold">Rd ${r.rd}</div>
+                ${badge}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  #29: SHARING
+// ═══════════════════════════════════════════════════════
+
+function sharePreview() {
+    const text = `F1XP Japan GP Predictions 🇯🇵\n\n` +
+        buildPredictedGrid(currentRaceNum()).slice(0,5).map((d,i) =>
+            `P${i+1} ${d.name} (${TEAMS[d.team].name}) — ${PTS_TABLE[i]}XP`
+        ).join('\n') +
+        `\n\nhttps://f1xp.vercel.app`;
+
+    if (navigator.share) {
+        navigator.share({ title: 'F1XP Predictions', text }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.querySelector('[onclick="sharePreview()"]');
+            if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.innerHTML = '<svg class="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>Share predictions'; }, 2000); }
+        });
+    }
+}
+
+function shareChampionship() {
+    const standings = DRIVERS.map(d => ({ name:d.name, pts: ACTUAL_POINTS[d.id]||0 }))
+        .sort((a,b) => b.pts - a.pts).slice(0,5);
+    const text = `F1XP 2026 Championship Standings\n\n` +
+        standings.map((s,i) => `${i+1}. ${s.name} — ${s.pts}pts`).join('\n') +
+        `\n\nhttps://f1xp.vercel.app/#championship`;
+
+    if (navigator.share) {
+        navigator.share({ title: 'F1XP Championship', text }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(text).then(() => {});
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+//  TABS — #13: ARIA updates, #20: URL hash navigation
+// ═══════════════════════════════════════════════════════
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+    }
+    const pane = document.getElementById(`tab-${tabName}`);
+    if (pane) pane.classList.add('active');
+}
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+        const tab = btn.dataset.tab;
+        switchTab(tab);
+        history.replaceState(null, '', `#${tab}`); // #20
     });
 });
 
@@ -953,9 +1190,11 @@ document.querySelectorAll('.champ-tab-btn').forEach(btn => {
         document.querySelectorAll('.champ-tab-btn').forEach(b => {
             b.classList.remove('bg-f1-dark','text-white');
             b.classList.add('bg-white','text-f1-muted','border','border-f1-dark/10');
+            b.setAttribute('aria-selected', 'false');
         });
         btn.classList.add('bg-f1-dark','text-white');
         btn.classList.remove('bg-white','text-f1-muted','border','border-f1-dark/10');
+        btn.setAttribute('aria-selected', 'true');
         document.getElementById('champ-drivers').classList.toggle('hidden', btn.dataset.champ !== 'drivers');
         document.getElementById('champ-constructors').classList.toggle('hidden', btn.dataset.champ !== 'constructors');
     });
@@ -966,12 +1205,23 @@ document.querySelectorAll('.champ-tab-btn').forEach(btn => {
 // ═══════════════════════════════════════════════════════
 
 async function init() {
-    const circ = CIRCUITS.suzuka;
-    const rain = await fetchWeather(circ.lat, circ.lon, '2026-04-06');
+    const circ = CIRCUITS[NEXT_RACE.circuitId]; // #5: from config
+    const rain = await fetchWeather(circ.lat, circ.lon, NEXT_RACE.date); // #5
     renderDriverGrid(rain);
     renderPreviousRaces();
     renderChampionship();
     renderCoralStats();
+    renderCalendar(); // #25
+
+    // #30: Start countdown
+    updateCountdown();
+    setInterval(updateCountdown, 60000);
+
+    // #20: Restore tab from URL hash
+    const hash = location.hash.slice(1);
+    if (hash && document.getElementById(`tab-${hash}`)) {
+        switchTab(hash);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', init);
