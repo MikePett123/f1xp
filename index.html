@@ -293,6 +293,56 @@ const TEAMS = {
     cadillac:     { name: 'Cadillac',       color: '#C8A951' },
 };
 
+// Driver headshots & team logos from Wikimedia Commons
+const DRIVER_IMGS = {
+    rus: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg/330px-KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg",
+    ant: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Kimi_Antonelli_at_the_2025_US_Grand_Prix_in_Austin%2C_TX_%28cropped%29.jpg/330px-Kimi_Antonelli_at_the_2025_US_Grand_Prix_in_Austin%2C_TX_%28cropped%29.jpg",
+    lec: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3978_by_Stepro_%28cropped2%29.jpg/330px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3978_by_Stepro_%28cropped2%29.jpg",
+    ham: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg/330px-Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg",
+    nor: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg/330px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg",
+    pia: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg/330px-2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg",
+    ver: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg/330px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg",
+    had: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Isack_Hadjar_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8753%29_%28cropped%29.jpg/330px-Isack_Hadjar_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8753%29_%28cropped%29.jpg",
+    law: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Liam_Lawson_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7793%29.jpg/330px-Liam_Lawson_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7793%29.jpg",
+    lin: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Arvid_Lindblad_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7869%29_%28cropped%29.jpg/330px-Arvid_Lindblad_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_%28028A7869%29_%28cropped%29.jpg",
+    alo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Alonso-68_%2824710447098%29.jpg/330px-Alonso-68_%2824710447098%29.jpg",
+    str: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/2025_Japan_GP_-_Aston_Martin_-_Lance_Stroll_-_Fanzone_Stage_%28cropped%29.jpg/330px-2025_Japan_GP_-_Aston_Martin_-_Lance_Stroll_-_Fanzone_Stage_%28cropped%29.jpg",
+    alb: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Alex_Albon_%28cropped%29.jpg/250px-Alex_Albon_%28cropped%29.jpg",
+    sai: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg/330px-Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg",
+    ocon: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Esteban_Ocon_2024_Suzuka_%28cropped%29.jpg/330px-Esteban_Ocon_2024_Suzuka_%28cropped%29.jpg",
+    bea: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/2025_Japan_GP_-_Haas_-_Oliver_Bearman_-_Thursday_%28cropped%29.jpg/330px-2025_Japan_GP_-_Haas_-_Oliver_Bearman_-_Thursday_%28cropped%29.jpg",
+    gas: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/2022_French_Grand_Prix_%2852279065728%29_%28midcrop%29.png/330px-2022_French_Grand_Prix_%2852279065728%29_%28midcrop%29.png",
+    col: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Franco_Colapinto_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8704%29_%28cropped%29.jpg/330px-Franco_Colapinto_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8704%29_%28cropped%29.jpg",
+    hul: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Nico_Hulkenberg_2016_Malaysia.jpg/330px-Nico_Hulkenberg_2016_Malaysia.jpg",
+    bor: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Gabriel_Bortoleto_%28cropped%29.jpg/330px-Gabriel_Bortoleto_%28cropped%29.jpg",
+    per: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/2021_US_GP_driver_parade_%28cropped2%29.jpg/330px-2021_US_GP_driver_parade_%28cropped2%29.jpg",
+    bot: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Valtteri_Bottas_at_the_2026_Adelaide_Motorsport_Festival_%28028A7567%29.jpg/330px-Valtteri_Bottas_at_the_2026_Adelaide_Motorsport_Festival_%28028A7567%29.jpg",
+};
+const TEAM_IMGS = {
+    mercedes:     "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Mercedes-AMG_Petronas_F1_Team_logo_%282026%29.svg/250px-Mercedes-AMG_Petronas_F1_Team_logo_%282026%29.svg.png",
+    ferrari:      "https://upload.wikimedia.org/wikipedia/en/thumb/d/df/Scuderia_Ferrari_HP_logo_24.svg/250px-Scuderia_Ferrari_HP_logo_24.svg.png",
+    mclaren:      "https://upload.wikimedia.org/wikipedia/en/thumb/6/66/McLaren_Racing_logo.svg/250px-McLaren_Racing_logo.svg.png",
+    red_bull:     "https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Red_Bull_Racing_Logo_2026.svg/250px-Red_Bull_Racing_Logo_2026.svg.png",
+    racing_bulls: "https://upload.wikimedia.org/wikipedia/en/thumb/2/2b/VCARB_F1_logo.svg/250px-VCARB_F1_logo.svg.png",
+    aston_martin: "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/Aston_Martin_Aramco_2024_logo.png/250px-Aston_Martin_Aramco_2024_logo.png",
+    williams:     "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Atlassian_Williams_F1_Team_logo.svg/330px-Atlassian_Williams_F1_Team_logo.svg.png",
+    haas:         "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/TGR_Haas_F1_Team_Logo_%282026%29.svg/330px-TGR_Haas_F1_Team_Logo_%282026%29.svg.png",
+    alpine:       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/BWT_Alpine_F1_Team_Logo.png/330px-BWT_Alpine_F1_Team_Logo.png",
+    audi:         "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Audif1.com_logo17_%28cropped%29.svg/250px-Audif1.com_logo17_%28cropped%29.svg.png",
+    cadillac:     "https://upload.wikimedia.org/wikipedia/en/thumb/b/bc/Cadillac_Formula_1_Team_Logo_%282025%29.svg/250px-Cadillac_Formula_1_Team_Logo_%282025%29.svg.png",
+};
+function driverAvatar(id, teamColor, size='w-8 h-8') {
+    const src = DRIVER_IMGS[id];
+    const initials = (DRIVERS.find(d=>d.id===id)?.name||'').split(' ').map(w=>w[0]).join('').slice(0,2);
+    if (src) return `<img src="${src}" alt="" class="${size} rounded-full object-cover object-top flex-shrink-0" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><span class="${size} rounded-full flex-shrink-0 items-center justify-center text-xs font-bold text-white" style="background:${teamColor};display:none">${initials}</span>`;
+    return `<span class="${size} rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white" style="background:${teamColor}">${initials}</span>`;
+}
+function teamLogo(teamKey, teamColor, h='h-5') {
+    const src = TEAM_IMGS[teamKey];
+    if (src) return `<img src="${src}" alt="" class="${h} w-auto object-contain flex-shrink-0" onerror="this.style.display='none'">`;
+    return `<span class="w-3 h-3 rounded-full flex-shrink-0" style="background:${teamColor}"></span>`;
+}
+
 // f125 = EA F1 25 game driver rating (used for predicted grid + CarCoeff_prior team avg)
 const DRIVERS = [
     { id:'nor', name:'Lando Norris',      abbr:'NOR', number:1,  team:'mclaren',      nationality:'🇬🇧', f125:95 },
@@ -636,8 +686,8 @@ function renderDriverGrid(rainProb) {
         return `
         <div class="driver-row grid grid-cols-12 gap-2 px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''}">
             <div class="col-span-1 text-center text-sm ${rankStyle}">P${rank}</div>
-            <div class="col-span-8 flex items-center gap-3">
-                <div class="w-1 h-8 rounded-full flex-shrink-0" style="background:${team.color}"></div>
+            <div class="col-span-8 flex items-center gap-2">
+                ${driverAvatar(d.id, team.color)}
                 <div>
                     <div class="font-bold text-f1-dark text-sm leading-tight">${d.name}</div>
                     <div class="text-xs text-f1-muted">${team.name}</div>
@@ -804,7 +854,7 @@ function renderChampionship() {
         <div class="champ-row grid grid-cols-12 gap-2 px-6 py-3.5 items-center transition-colors">
             <div class="col-span-1 text-sm ${rankStyle}">${rank}</div>
             <div class="col-span-3 flex items-center gap-2">
-                <div class="w-1 h-7 rounded-full flex-shrink-0" style="background:${s.team.color}"></div>
+                ${driverAvatar(s.driver.id, s.team.color)}
                 <div>
                     <div class="font-bold text-sm text-f1-dark leading-tight">${s.driver.name}</div>
                     <div class="text-xs text-f1-muted">${s.team.name}</div>
@@ -837,7 +887,7 @@ function renderChampionship() {
         <div class="champ-row grid grid-cols-12 gap-2 px-6 py-4 items-center transition-colors">
             <div class="col-span-1 text-sm font-semibold text-f1-muted">${rank}</div>
             <div class="col-span-3 flex items-center gap-3">
-                <div class="w-3 h-3 rounded-full flex-shrink-0" style="background:${c.team.color}"></div>
+                ${teamLogo(Object.keys(TEAMS).find(k => TEAMS[k].name === c.team.name), c.team.color)}
                 <span class="font-bold text-f1-dark truncate">${c.team.name}</span>
             </div>
             <div class="col-span-2 text-right font-black text-f1-dark tabular-nums">${c.pts}</div>
