@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" fill="none">
+  <defs>
+    <linearGradient id="slash" x1="0.4" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#E8002D"/>
+      <stop offset="100%" stop-color="#6B0015"/>
+    </linearGradient>
+  </defs>
+  <!-- f -->
+  <text x="0" y="52" font-family="'Red Hat Display', system-ui, sans-serif" font-weight="900" font-size="58" font-style="italic" fill="#1C1C2E" letter-spacing="-3">f</text>
+  <!-- Red diagonal slash (behind the 1) -->
+  <polygon points="55,0 63,0 33,60 25,60" fill="url(#slash)"/>
+  <polygon points="63,0 66,0 36,60 33,60" fill="url(#slash)" opacity="0.4"/>
+  <!-- 1 -->
+  <text x="30" y="52" font-family="'Red Hat Display', system-ui, sans-serif" font-weight="900" font-size="58" font-style="italic" fill="#1C1C2E" letter-spacing="-3">1</text>
+  <!-- XPs -->
+  <text x="62" y="52" font-family="'Red Hat Display', system-ui, sans-serif" font-weight="900" font-size="58" font-style="italic" fill="#1C1C2E" letter-spacing="-3">XP</text>
+  <text x="138" y="52" font-family="'Red Hat Display', system-ui, sans-serif" font-weight="900" font-size="58" font-style="italic" fill="#1C1C2E" letter-spacing="-2">s</text>
+</svg>
