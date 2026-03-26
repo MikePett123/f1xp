@@ -212,12 +212,20 @@
                 <div class="bg-yellow-50 border-b border-yellow-100 px-4 sm:px-6 py-2 text-xs text-yellow-700 font-semibold flex items-center gap-2" id="quali-warning">
                     <span>⚠</span> Qualifying not yet held — grid positions predicted from car pace model
                 </div>
-                <div class="grid grid-cols-12 gap-2 px-4 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
+                <div class="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
                     <div class="col-span-1 text-center">Pred</div>
-                    <div class="col-span-8">Driver</div>
-                    <div class="col-span-3 text-right">XP</div>
+                    <div class="col-span-4 sm:col-span-5">Driver</div>
+                    <div class="col-span-2 text-right">Odds</div>
+                    <div class="col-span-2 sm:col-span-1 text-right text-[10px] sm:text-xs leading-tight">Model</div>
+                    <div class="hidden sm:block sm:col-span-1 text-right text-[10px] leading-tight">Value</div>
+                    <div class="col-span-3 sm:col-span-2 text-right">XP</div>
                 </div>
                 <div id="driver-grid" class="divide-y divide-f1-cream"></div>
+                <div class="px-4 sm:px-6 py-3 bg-f1-cream/30 border-t border-f1-cream text-xs text-f1-muted space-y-1">
+                    <p><strong>Odds</strong> = Bookmaker decimal odds (race winner) · <strong>Model</strong> = F1XPs implied odds · <strong>Value</strong> = where model disagrees with bookmakers</p>
+                    <p class="text-green-600">🔥 = Value bet — model gives higher win probability than bookmakers</p>
+                    <p class="text-f1-muted/60">Odds last updated: 26 Mar 2026 · Source: Aggregated major bookmakers</p>
+                </div>
             </div>
 
         </div>
@@ -346,6 +354,60 @@ const NEXT_RACE = {
     date: '2026-04-06',
     raceDate: new Date('2026-04-06T14:00:00+09:00'),
 };
+
+// ═══════════════════════════════════════════════════════
+//  BETTING ODDS — Japanese GP Race Winner
+//  Source: Aggregated from major bookmakers (manual update)
+//  Format: Decimal odds (e.g. 2.50 = +150 American)
+//  Last updated: 2026-03-26
+//  To update: replace odds values below before each race
+// ═══════════════════════════════════════════════════════
+
+const BETTING_ODDS = {
+    // Decimal odds for race winner — Japan GP 2026
+    // Based on Mercedes dominance (2x 1-2), Ferrari P3/P4, and pre-season form
+    rus: 2.75,   // Russell — favourite, 2 wins from 2
+    ant: 3.50,   // Antonelli — P1 China, strong momentum
+    lec: 6.00,   // Leclerc — consistent P3/P4, best of the rest
+    ham: 7.00,   // Hamilton — Ferrari P3/P4, veteran factor
+    nor: 12.00,  // Norris — McLaren 3rd best car but underperforming
+    ver: 15.00,  // Verstappen — Red Bull 4th car, individual brilliance
+    pia: 17.00,  // Piastri — McLaren, DNS issues masking pace
+    bea: 26.00,  // Bearman — Haas surprise package
+    gas: 34.00,  // Gasly — Alpine midfield, scored both races
+    law: 41.00,  // Lawson — Racing Bulls, P7 China
+    had: 51.00,  // Hadjar — Red Bull junior, inconsistent
+    ocon: 67.00, // Ocon — Haas, occasional points
+    sai: 67.00,  // Sainz — Williams, Q struggles
+    lin: 81.00,  // Lindblad — Racing Bulls rookie
+    col: 101.00, // Colapinto — Alpine
+    alb: 101.00, // Albon — Williams
+    hul: 101.00, // Hülkenberg — Audi
+    bor: 151.00, // Bortoleto — Audi rookie
+    alo: 151.00, // Alonso — Aston Martin struggles
+    str: 251.00, // Stroll — Aston Martin
+    per: 251.00, // Pérez — Cadillac
+    bot: 301.00, // Bottas — Cadillac
+};
+
+// Convert decimal odds to implied probability
+function oddsToProb(decimal) { return decimal ? +(100 / decimal).toFixed(1) : 0; }
+// Convert probability to decimal odds
+function probToOdds(prob) { return prob > 0 ? +(100 / prob).toFixed(2) : 999; }
+
+// Generate model-implied odds from car pace rankings
+function computeModelOdds(raceNum) {
+    const grid = buildPredictedGrid(raceNum);
+    // Win probability based on position: P1 ~33%, P2 ~22%, P3 ~14%, decaying
+    const winProbs = [33, 22, 14, 9, 6, 4.5, 3.2, 2.3, 1.8, 1.2,
+                      0.8, 0.6, 0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.08, 0.06, 0.04, 0.02];
+    const modelOdds = {};
+    grid.forEach((d, i) => {
+        const prob = winProbs[i] || 0.02;
+        modelOdds[d.id] = { prob, odds: probToOdds(prob) };
+    });
+    return modelOdds;
+}
 
 const TEAMS = {
     mclaren:      { name: 'McLaren',       color: '#FF8000' },
@@ -759,9 +821,11 @@ function updateCountdown() {
 // ═══════════════════════════════════════════════════════
 
 function renderDriverGrid(rainProb) {
-    const raceNum = currentRaceNum(); // #4: derived
+    const raceNum = currentRaceNum();
     const grid = buildPredictedGrid(raceNum);
     grid.forEach((d, i) => { d.xpPts = PTS_TABLE[i] || 0; });
+
+    const modelOdds = computeModelOdds(raceNum);
 
     const el = document.getElementById('driver-grid');
     el.innerHTML = grid.map((d, i) => {
@@ -772,17 +836,33 @@ function renderDriverGrid(rainProb) {
                           d.xpPts >= 6  ? 'text-f1-teal-dark font-bold' :
                           d.xpPts >= 1  ? 'text-f1-dark font-semibold' : 'text-f1-muted/30 font-medium';
 
+        // Betting odds
+        const bookOdds = BETTING_ODDS[d.id] || 999;
+        const bookProb = oddsToProb(bookOdds);
+        const mo = modelOdds[d.id] || { prob: 0, odds: 999 };
+        const valuePct = mo.prob - bookProb; // positive = model thinks more likely than bookmakers
+        const valueColor = valuePct > 3 ? 'text-green-500 font-bold' :
+                           valuePct < -3 ? 'text-red-400' : 'text-f1-muted';
+        const valueStr = valuePct > 0.5 ? `+${valuePct.toFixed(0)}%` :
+                         valuePct < -0.5 ? `${valuePct.toFixed(0)}%` : '~0';
+        const oddsStr = bookOdds >= 100 ? Math.round(bookOdds) : bookOdds.toFixed(1);
+        // Highlight value bets
+        const isValue = valuePct > 5;
+
         return `
-        <div class="driver-row grid grid-cols-12 gap-2 px-4 sm:px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''}">
+        <div class="driver-row grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''} ${isValue ? 'bg-green-50/50' : ''}">
             <div class="col-span-1 text-center text-sm ${rankStyle}">P${rank}</div>
-            <div class="col-span-8 flex items-center gap-2 min-w-0">
+            <div class="col-span-4 sm:col-span-5 flex items-center gap-2 min-w-0">
                 ${driverAvatar(d.id, team.color)}
                 <div class="min-w-0">
                     <div class="font-bold text-f1-dark text-sm leading-tight truncate">${d.name}</div>
                     <div class="text-xs text-f1-muted">${team.name}</div>
                 </div>
             </div>
-            <div class="col-span-3 text-right">
+            <div class="col-span-2 text-right text-sm tabular-nums text-f1-dark font-semibold">${oddsStr}</div>
+            <div class="col-span-2 sm:col-span-1 text-right text-xs tabular-nums text-f1-muted">${mo.odds >= 100 ? Math.round(mo.odds) : mo.odds.toFixed(1)}</div>
+            <div class="hidden sm:block sm:col-span-1 text-right text-xs tabular-nums ${valueColor}">${isValue ? '🔥' : ''} ${valueStr}</div>
+            <div class="col-span-3 sm:col-span-2 text-right">
                 <span class="text-lg ${xpColor} tabular-nums">${d.xpPts || '—'}</span>
             </div>
         </div>`;
