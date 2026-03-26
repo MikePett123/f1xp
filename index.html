@@ -218,22 +218,6 @@
                 <div id="driver-grid" class="divide-y divide-f1-cream"></div>
             </div>
 
-            <!-- #27: Model transparency panel -->
-            <details class="mt-4 bg-white rounded-2xl border border-f1-dark/8 overflow-hidden">
-                <summary class="px-4 sm:px-6 py-4 cursor-pointer font-bold text-f1-dark text-sm flex items-center justify-between hover:bg-f1-cream/40">
-                    How does the F1XP model work?
-                    <span class="text-f1-muted text-xs">Click to expand</span>
-                </summary>
-                <div class="px-4 sm:px-6 py-4 border-t border-f1-cream text-sm text-f1-muted space-y-3">
-                    <p><strong class="text-f1-dark">Car Coefficient</strong> — Each team is rated on a 0–100 scale based on qualifying and race pace data, blended with pre-season priors. As the season progresses, real data dominates.</p>
-                    <p><strong class="text-f1-dark">Driver Rating</strong> — Based on EA F1 25 game ratings, compressed to ±3% of car pace. The car determines the band; driver talent is the tiebreaker.</p>
-                    <p><strong class="text-f1-dark">Safety Car Factor</strong> — Circuit-specific SC probability adjusts XP. Front-runners lose value under SC; midfield benefits.</p>
-                    <p><strong class="text-f1-dark">Weather Adjustment</strong> — Rain compresses the field, reducing front-runner XP and boosting midfield drivers.</p>
-                    <p><strong class="text-f1-dark">Reliability Factor</strong> — Teams with weaker infrastructure face a small DNF probability, reducing their expected points.</p>
-                    <p><strong class="text-f1-dark">Fastest Lap Bonus</strong> — Top-10 finishers have a chance at the +1 FL bonus, weighted by car pace.</p>
-                    <div id="model-weights" class="mt-3 p-3 bg-f1-cream rounded-xl text-xs"></div>
-                </div>
-            </details>
         </div>
 
         <!-- ─── PREVIOUS RACES ─── -->
@@ -803,12 +787,6 @@ function renderDriverGrid(rainProb) {
         </div>`;
     }).join('');
 
-    // #27: Model weights display
-    const mw = document.getElementById('model-weights');
-    if (mw) {
-        const [wp, wd] = blendWeights(raceNum);
-        mw.innerHTML = `<strong>Current blend (Rd ${raceNum}):</strong> Prior ${Math.round(wp*100)}% / Data ${Math.round(wd*100)}% · Reliability factor applied · FL bonus for top-10`;
-    }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1077,8 +1055,8 @@ const CALENDAR_2026 = [
     { rd:1,  name:'Australian GP',    loc:'Melbourne',     date:'8 Mar',  flag:'🇦🇺', completed:true },
     { rd:2,  name:'Chinese GP',       loc:'Shanghai',      date:'15 Mar', flag:'🇨🇳', completed:true },
     { rd:3,  name:'Japanese GP',      loc:'Suzuka',        date:'6 Apr',  flag:'🇯🇵', next:true },
-    { rd:4,  name:'Bahrain GP',       loc:'Sakhir',        date:'13 Apr', flag:'🇧🇭' },
-    { rd:5,  name:'Saudi Arabian GP', loc:'Jeddah',        date:'20 Apr', flag:'🇸🇦' },
+    { rd:4,  name:'Bahrain GP',       loc:'Sakhir',        date:'13 Apr', flag:'🇧🇭', cancelled:true },
+    { rd:5,  name:'Saudi Arabian GP', loc:'Jeddah',        date:'20 Apr', flag:'🇸🇦', cancelled:true },
     { rd:6,  name:'Miami GP',         loc:'Miami',         date:'4 May',  flag:'🇺🇸' },
     { rd:7,  name:'Emilia Romagna GP',loc:'Imola',         date:'18 May', flag:'🇮🇹' },
     { rd:8,  name:'Monaco GP',        loc:'Monte Carlo',   date:'25 May', flag:'🇲🇨' },
@@ -1104,19 +1082,21 @@ function renderCalendar() {
     const el = document.getElementById('season-calendar');
     if (!el) return;
     el.innerHTML = CALENDAR_2026.map(r => {
-        const status = r.completed ? 'completed' : r.next ? 'next' : 'upcoming';
-        const badge = r.completed ? '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">Done</span>'
+        const status = r.cancelled ? 'cancelled' : r.completed ? 'completed' : r.next ? 'next' : 'upcoming';
+        const badge = r.cancelled ? '<span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">Cancelled</span>'
+                    : r.completed ? '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">Done</span>'
                     : r.next ? '<span class="text-xs bg-f1-coral/20 text-f1-coral px-2 py-0.5 rounded-full font-bold">Next</span>'
                     : '';
+        const strike = r.cancelled ? 'line-through opacity-50' : '';
         return `
-        <div class="calendar-round ${status} flex items-center gap-3 px-4 sm:px-6 py-3 border-b border-f1-cream hover:bg-f1-cream/40 transition-colors">
+        <div class="calendar-round ${status} flex items-center gap-3 px-4 sm:px-6 py-3 border-b border-f1-cream hover:bg-f1-cream/40 transition-colors ${r.cancelled ? 'opacity-60' : ''}">
             <span class="text-xl flex-shrink-0">${r.flag}</span>
             <div class="flex-1 min-w-0">
-                <div class="font-bold text-f1-dark text-sm truncate">${r.name}</div>
-                <div class="text-xs text-f1-muted">${r.loc} · ${r.date}</div>
+                <div class="font-bold text-f1-dark text-sm truncate ${strike}">${r.name}</div>
+                <div class="text-xs text-f1-muted ${strike}">${r.loc} · ${r.date}</div>
             </div>
             <div class="flex-shrink-0 text-right">
-                <div class="text-xs text-f1-muted font-semibold">Rd ${r.rd}</div>
+                <div class="text-xs text-f1-muted font-semibold ${strike}">Rd ${r.rd}</div>
                 ${badge}
             </div>
         </div>`;
