@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F1XP — The Official Unofficial Home of F1 Predictions</title>
-    <meta name="description" content="F1XP uses a proprietary weighted model to calculate expected points for every driver, every race. Data-driven Formula 1 predictions for the 2026 season.">
-    <meta property="og:title" content="F1XP — The Official Unofficial Home of F1 Predictions">
+    <title>F1XPs — The Official Unofficial Home of F1 Predictions</title>
+    <meta name="description" content="F1XPs uses a proprietary weighted model to calculate expected points for every driver, every race. Data-driven Formula 1 predictions for the 2026 season.">
+    <meta property="og:title" content="F1XPs — The Official Unofficial Home of F1 Predictions">
     <meta property="og:description" content="Data-driven F1 expected points model. Like xG in football, but for Formula 1.">
     <meta property="og:type" content="website">
     <!-- #19: Canonical link -->
-    <link rel="canonical" href="https://f1xp.vercel.app/">
+    <link rel="canonical" href="https://f1xps.vercel.app/">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -41,7 +41,7 @@
         .trend-down { color: #ef4444; }
         .trend-same { color: #94a3b8; }
 
-        .f1xp-score-bar { transition: width 0.7s ease; }
+        .f1xps-score-bar { transition: width 0.7s ease; }
 
         /* #15: Focus-visible styles for keyboard navigation */
         *:focus-visible {
@@ -84,9 +84,12 @@
 <nav class="bg-f1-dark text-white sticky top-0 z-50 border-b border-white/10">
     <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <a href="#" class="text-xl font-black tracking-tight flex items-center gap-2">
-                <span class="bg-f1-coral text-white text-xs font-black px-1.5 py-0.5 rounded">F1</span>
-                <span>XP</span>
+            <a href="#" class="flex items-center gap-0 group" aria-label="F1XPs Home">
+                <svg width="80" height="28" viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+                    <rect x="0" y="2" width="28" height="24" rx="5" fill="#E07B6E"/>
+                    <text x="14" y="20" text-anchor="middle" font-family="Red Hat Display, system-ui, sans-serif" font-weight="900" font-size="14" fill="white">F1</text>
+                    <text x="50" y="21" text-anchor="middle" font-family="Red Hat Display, system-ui, sans-serif" font-weight="900" font-size="18" fill="white">XPs</text>
+                </svg>
             </a>
             <span class="text-white/40 text-sm hidden sm:block">Season 2026</span>
         </div>
@@ -107,13 +110,13 @@
         <div class="max-w-2xl">
             <p class="text-f1-dark/60 font-semibold text-sm uppercase tracking-widest mb-4">Formula 1 · Expected Points Model</p>
             <h1 class="text-6xl md:text-8xl font-black text-f1-dark tracking-tight leading-none">
-                F1<span class="text-white">XP</span>
+                F1<span class="text-white">XPs</span>
             </h1>
             <p class="text-f1-dark/80 text-xl md:text-2xl font-semibold mt-4 mb-6 leading-snug">
                 The official unofficial home of F1 predictions
             </p>
             <p class="text-f1-dark/70 text-base leading-relaxed max-w-lg">
-                Like xG in football, F1XP quantifies how many points each driver <em>should</em> score — combining car pace, driver talent, track fit, conditions and more into a single expected-points figure.
+                Like xG in football, F1XPs quantifies how many points each driver <em>should</em> score — combining car pace, driver talent, track fit, conditions and more into a single expected-points figure.
             </p>
             <div class="mt-8 flex items-center gap-6">
                 <div class="text-center">
@@ -201,7 +204,7 @@
             <div class="bg-white rounded-2xl overflow-hidden border border-f1-dark/8">
                 <div class="px-4 sm:px-6 py-4 border-b border-f1-cream flex items-center justify-between">
                     <div>
-                        <h3 class="font-black text-f1-dark text-lg">F1XP Pre-Race Predictions</h3>
+                        <h3 class="font-black text-f1-dark text-lg">F1XPs Pre-Race Predictions</h3>
                         <p class="text-f1-muted text-xs mt-0.5">Points each driver is expected to score — ranked by car pace, track fit &amp; conditions</p>
                     </div>
                     <!-- #28: Qualifying integration placeholder -->
@@ -237,7 +240,7 @@
                 <div class="px-4 sm:px-6 py-4 border-b border-f1-cream flex items-center justify-between">
                     <div>
                         <h3 class="font-black text-f1-dark text-lg">2026 Driver Championship</h3>
-                        <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China · Actual pts vs F1XP accumulated expected pts</p>
+                        <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China · Actual pts vs F1XPs accumulated expected pts</p>
                     </div>
                     <!-- #29: Share -->
                     <button onclick="shareChampionship()" class="text-f1-muted hover:text-f1-dark p-2 rounded-lg transition-colors" title="Share standings">
@@ -293,9 +296,9 @@
 <!-- #16: Improved contrast — changed bg to darker coral, text to full white -->
 <section class="bg-f1-coral py-16">
     <div class="max-w-7xl mx-auto px-4 text-center">
-        <h2 class="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">What does F1XP tell us?</h2>
+        <h2 class="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">What does F1XPs tell us?</h2>
         <p class="text-white text-lg max-w-2xl mx-auto leading-relaxed">
-            If a driver consistently outperforms their F1XP, they're beating the model — whether through brilliance, luck, or circumstances the model hasn't yet accounted for. Over a season, the gap between F1XP and real points is the most honest measure of performance.
+            If a driver consistently outperforms their F1XPs, they're beating the model — whether through brilliance, luck, or circumstances the model hasn't yet accounted for. Over a season, the gap between F1XPs and real points is the most honest measure of performance.
         </p>
         <!-- #33: Race-by-race model evolution -->
         <div class="mt-6 text-white/90 text-sm font-semibold" id="model-evolution-summary"></div>
@@ -321,12 +324,15 @@
 <footer class="bg-f1-dark text-white/60 py-10">
     <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
         <div class="flex items-center gap-2">
-            <span class="bg-f1-coral text-white text-xs font-black px-1.5 py-0.5 rounded">F1</span>
-            <span class="font-bold text-white">XP</span>
+            <svg width="64" height="22" viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+                <rect x="0" y="2" width="28" height="24" rx="5" fill="#E07B6E"/>
+                <text x="14" y="20" text-anchor="middle" font-family="Red Hat Display, system-ui, sans-serif" font-weight="900" font-size="14" fill="white">F1</text>
+                <text x="50" y="21" text-anchor="middle" font-family="Red Hat Display, system-ui, sans-serif" font-weight="900" font-size="18" fill="white">XPs</text>
+            </svg>
             <span class="text-white/40">· 2026 Season</span>
         </div>
         <p class="text-center text-xs leading-relaxed max-w-sm text-white/50">
-            F1XP is a fan project. Not affiliated with Formula 1, FIA, or any constructor. Live weather via Open-Meteo.
+            F1XPs is a fan project. Not affiliated with Formula 1, FIA, or any constructor. Live weather via Open-Meteo.
         </p>
         <div class="text-xs text-white/40">Rounds 1–2 complete · Round 3 next</div>
     </div>
@@ -703,7 +709,7 @@ function computeRankedXP(race) {
     return out;
 }
 
-function computeAccumulatedF1XP() {
+function computeAccumulatedF1XPs() {
     const acc = {};
     DRIVERS.forEach(d => { acc[d.id] = 0; });
     PAST_RACES.forEach(race => {
@@ -918,7 +924,7 @@ function computeChampPositions() {
 }
 
 function renderChampionship() {
-    const xpAcc = computeAccumulatedF1XP();
+    const xpAcc = computeAccumulatedF1XPs();
     const { expChampPos, expCtorPos } = computeChampPositions();
 
     const standings = DRIVERS.map(d => ({
@@ -1111,14 +1117,14 @@ function renderCalendar() {
 // ═══════════════════════════════════════════════════════
 
 function sharePreview() {
-    const text = `F1XP Japan GP Predictions 🇯🇵\n\n` +
+    const text = `F1XPs Japan GP Predictions 🇯🇵\n\n` +
         buildPredictedGrid(currentRaceNum()).slice(0,5).map((d,i) =>
             `P${i+1} ${d.name} (${TEAMS[d.team].name}) — ${PTS_TABLE[i]}XP`
         ).join('\n') +
-        `\n\nhttps://f1xp.vercel.app`;
+        `\n\nhttps://f1xps.vercel.app`;
 
     if (navigator.share) {
-        navigator.share({ title: 'F1XP Predictions', text }).catch(() => {});
+        navigator.share({ title: 'F1XPs Predictions', text }).catch(() => {});
     } else {
         navigator.clipboard.writeText(text).then(() => {
             const btn = document.querySelector('[onclick="sharePreview()"]');
@@ -1130,12 +1136,12 @@ function sharePreview() {
 function shareChampionship() {
     const standings = DRIVERS.map(d => ({ name:d.name, pts: ACTUAL_POINTS[d.id]||0 }))
         .sort((a,b) => b.pts - a.pts).slice(0,5);
-    const text = `F1XP 2026 Championship Standings\n\n` +
+    const text = `F1XPs 2026 Championship Standings\n\n` +
         standings.map((s,i) => `${i+1}. ${s.name} — ${s.pts}pts`).join('\n') +
-        `\n\nhttps://f1xp.vercel.app/#championship`;
+        `\n\nhttps://f1xps.vercel.app/#championship`;
 
     if (navigator.share) {
-        navigator.share({ title: 'F1XP Championship', text }).catch(() => {});
+        navigator.share({ title: 'F1XPs Championship', text }).catch(() => {});
     } else {
         navigator.clipboard.writeText(text).then(() => {});
     }
