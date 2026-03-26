@@ -800,6 +800,14 @@ function renderPreviousRaces() {
         const xpPts = computeRankedXP(race);
         const sorted = [...race.results].sort((a, b) => a.pos - b.pos);
 
+        // Compute expected finishing positions for this race
+        const rn = currentRaceNum();
+        const expGrid = DRIVERS
+            .map(d => ({ id: d.id, score: carCoeff(d.team, rn) * (1 + (d.f125 - 85) * 0.003) }))
+            .sort((a, b) => b.score - a.score);
+        const expPos = {};
+        expGrid.forEach((d, i) => { expPos[d.id] = i + 1; });
+
         const rows = sorted.map(r => {
             const driver = DRIVERS.find(d => d.id === r.id);
             if (!driver) return '';
@@ -810,15 +818,17 @@ function renderPreviousRaces() {
                                delta < -2 ? 'text-red-400 font-bold' : 'text-f1-muted';
             const deltaStr = delta === 0 ? '0' : (delta > 0 ? '+' : '') + delta;
             const showDelta = r.pts > 0 || xp > 0;
+            const ep = expPos[r.id] || '—';
 
             return `
             <div class="grid grid-cols-12 gap-1 px-3 sm:px-5 py-3 items-center hover:bg-f1-cream/40 transition-colors">
-                <div class="col-span-6 flex items-center gap-2 min-w-0">
+                <div class="col-span-4 sm:col-span-5 flex items-center gap-2 min-w-0">
                     <div class="w-1 h-6 rounded-full flex-shrink-0" style="background:${team.color}"></div>
                     <div class="font-bold text-f1-dark text-sm leading-tight truncate">${driver.name}</div>
                 </div>
-                <div class="col-span-2 text-right font-bold text-sm tabular-nums text-f1-teal-dark">${xp || '—'}</div>
-                <div class="col-span-2 text-right font-bold text-sm tabular-nums ${r.pts > 0 ? 'text-f1-dark' : 'text-f1-muted/30'}">${r.pts > 0 ? r.pts : '—'}</div>
+                <div class="col-span-2 text-right text-sm text-f1-muted tabular-nums">P${ep}</div>
+                <div class="col-span-2 sm:col-span-1 text-right font-bold text-sm tabular-nums text-f1-teal-dark">${xp || '—'}</div>
+                <div class="col-span-2 sm:col-span-2 text-right font-bold text-sm tabular-nums ${r.pts > 0 ? 'text-f1-dark' : 'text-f1-muted/30'}">${r.pts > 0 ? r.pts : '—'}</div>
                 <div class="col-span-2 text-right text-sm ${deltaColor} tabular-nums">${showDelta ? deltaStr : '—'}</div>
             </div>`;
         }).join('');
@@ -852,8 +862,9 @@ function renderPreviousRaces() {
             </button>
             <div class="prev-race-body ${isOpen ? 'open' : ''}" id="race-body-${ri}" role="region">
                 <div class="grid grid-cols-12 gap-1 px-3 sm:px-5 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
-                    <div class="col-span-6">Driver</div>
-                    <div class="col-span-2 text-right">XP</div>
+                    <div class="col-span-4 sm:col-span-5">Driver</div>
+                    <div class="col-span-2 text-right">Exp.</div>
+                    <div class="col-span-2 sm:col-span-1 text-right">XP</div>
                     <div class="col-span-2 text-right">Actual</div>
                     <div class="col-span-2 text-right">Δ</div>
                 </div>
@@ -878,11 +889,13 @@ function toggleRace(i) {
 // ═══════════════════════════════════════════════════════
 
 function computeChampPositions() {
+    // Use currentRaceNum so expected positions reflect what we know NOW
+    // (not stale per-race coefficients where AUS=0 would use 100% prior)
+    const rn = currentRaceNum();
     const expSum = {}, expN = {};
-    // #2: Use each race's own raceNum so positions evolve
-    PAST_RACES.filter(r => !r.isSprint).forEach(race => {
+    PAST_RACES.filter(r => !r.isSprint).forEach(() => {
         [...DRIVERS]
-            .map(d => ({ id: d.id, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
+            .map(d => ({ id: d.id, score: carCoeff(d.team, rn) * (1 + (d.f125 - 85) * 0.003) }))
             .sort((a, b) => b.score - a.score)
             .forEach((d, i) => { expSum[d.id] = (expSum[d.id] || 0) + i + 1; expN[d.id] = (expN[d.id] || 0) + 1; });
     });
@@ -892,21 +905,11 @@ function computeChampPositions() {
     const expChampPos = {};
     sorted.forEach((d, i) => { expChampPos[d.id] = i + 1; });
 
-    // Constructor positions
-    const teamExpSum = {}, teamExpN = {};
-    PAST_RACES.filter(r => !r.isSprint).forEach(race => {
-        const raceRanks = {};
-        [...DRIVERS]
-            .map(d => ({ id: d.id, team: d.team, score: carCoeff(d.team, race.raceNum) * (1 + (d.f125 - 85) * 0.003) }))
-            .sort((a, b) => b.score - a.score)
-            .forEach((d, i) => { raceRanks[d.id] = i + 1; });
-        DRIVERS.forEach(d => {
-            teamExpSum[d.team] = (teamExpSum[d.team] || 0) + raceRanks[d.id];
-            teamExpN[d.team] = (teamExpN[d.team] || 0) + 1;
-        });
-    });
+    // Constructor positions — rank by TEAM_DATA_COEFF directly
+    // These are the user's explicit team power ratings (Mercedes 97, Ferrari 83, Alpine 58, etc.)
+    // Using data coeffs avoids stale priors dragging midfield teams down
     const sortedTeams = Object.keys(TEAMS).sort((a, b) =>
-        (teamExpN[a] ? teamExpSum[a] / teamExpN[a] : 999) - (teamExpN[b] ? teamExpSum[b] / teamExpN[b] : 999)
+        (TEAM_DATA_COEFF[b] || 0.85) - (TEAM_DATA_COEFF[a] || 0.85)
     );
     const expCtorPos = {};
     sortedTeams.forEach((t, i) => { expCtorPos[t] = i + 1; });
