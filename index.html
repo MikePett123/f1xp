@@ -212,20 +212,12 @@
                 <div class="bg-yellow-50 border-b border-yellow-100 px-4 sm:px-6 py-2 text-xs text-yellow-700 font-semibold flex items-center gap-2" id="quali-warning">
                     <span>⚠</span> Qualifying not yet held — grid positions predicted from car pace model
                 </div>
-                <div class="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
+                <div class="grid grid-cols-12 gap-2 px-4 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
                     <div class="col-span-1 text-center">Pred</div>
-                    <div class="col-span-4 sm:col-span-5">Driver</div>
-                    <div class="col-span-2 text-right">Odds</div>
-                    <div class="col-span-2 sm:col-span-1 text-right text-[10px] sm:text-xs leading-tight">Model</div>
-                    <div class="hidden sm:block sm:col-span-1 text-right text-[10px] leading-tight">Value</div>
-                    <div class="col-span-3 sm:col-span-2 text-right">XP</div>
+                    <div class="col-span-8">Driver</div>
+                    <div class="col-span-3 text-right">XP</div>
                 </div>
                 <div id="driver-grid" class="divide-y divide-f1-cream"></div>
-                <div class="px-4 sm:px-6 py-3 bg-f1-cream/30 border-t border-f1-cream text-xs text-f1-muted space-y-1">
-                    <p><strong>Odds</strong> = Bookmaker decimal odds (race winner) · <strong>Model</strong> = F1XPs implied odds · <strong>Value</strong> = where model disagrees with bookmakers</p>
-                    <p class="text-green-600">🔥 = Value bet — model gives higher win probability than bookmakers</p>
-                    <p class="text-f1-muted/60">Odds last updated: 26 Mar 2026 · Source: Aggregated major bookmakers</p>
-                </div>
             </div>
 
         </div>
@@ -850,19 +842,16 @@ function renderDriverGrid(rainProb) {
         const isValue = valuePct > 5;
 
         return `
-        <div class="driver-row grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''} ${isValue ? 'bg-green-50/50' : ''}">
+        <div class="driver-row grid grid-cols-12 gap-2 px-4 sm:px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''}">
             <div class="col-span-1 text-center text-sm ${rankStyle}">P${rank}</div>
-            <div class="col-span-4 sm:col-span-5 flex items-center gap-2 min-w-0">
+            <div class="col-span-8 flex items-center gap-2 min-w-0">
                 ${driverAvatar(d.id, team.color)}
                 <div class="min-w-0">
                     <div class="font-bold text-f1-dark text-sm leading-tight truncate">${d.name}</div>
                     <div class="text-xs text-f1-muted">${team.name}</div>
                 </div>
             </div>
-            <div class="col-span-2 text-right text-sm tabular-nums text-f1-dark font-semibold">${oddsStr}</div>
-            <div class="col-span-2 sm:col-span-1 text-right text-xs tabular-nums text-f1-muted">${mo.odds >= 100 ? Math.round(mo.odds) : mo.odds.toFixed(1)}</div>
-            <div class="hidden sm:block sm:col-span-1 text-right text-xs tabular-nums ${valueColor}">${isValue ? '🔥' : ''} ${valueStr}</div>
-            <div class="col-span-3 sm:col-span-2 text-right">
+            <div class="col-span-3 text-right">
                 <span class="text-lg ${xpColor} tabular-nums">${d.xpPts || '—'}</span>
             </div>
         </div>`;
