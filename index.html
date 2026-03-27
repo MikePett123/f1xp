@@ -9,7 +9,7 @@
     <meta property="og:description" content="Data-driven F1 expected points model. Like xG in football, but for Formula 1.">
     <meta property="og:type" content="website">
     <!-- #19: Canonical link -->
-    <link rel="canonical" href="https://f1xps.vercel.app/">
+    <link rel="canonical" href="https://f1xps.com/">
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/assets/f1xps/favicon.svg">
     <link rel="apple-touch-icon" href="/assets/f1xps/favicon.svg">
@@ -1224,7 +1224,7 @@ let _shareUrl  = '';
 function buildShareText(type) {
     if (type === 'next') {
         const grid = buildPredictedGrid(currentRaceNum());
-        _shareUrl  = 'https://f1xps.vercel.app';
+        _shareUrl  = 'https://f1xps.com';
         _shareText = `🏎 F1XPs Japan GP Predictions\n\n` +
             grid.slice(0,5).map((d,i) =>
                 `P${i+1} ${d.name} — ${PTS_TABLE[i]}XPs`
@@ -1233,7 +1233,7 @@ function buildShareText(type) {
     } else {
         const standings = DRIVERS.map(d => ({ name:d.name, pts: ACTUAL_POINTS[d.id]||0 }))
             .sort((a,b) => b.pts - a.pts).slice(0,5);
-        _shareUrl  = 'https://f1xps.vercel.app/#championship';
+        _shareUrl  = 'https://f1xps.com/#championship';
         _shareText = `🏆 F1XPs 2026 Championship\n\n` +
             standings.map((s,i) => `${i+1}. ${s.name} — ${s.pts}pts`).join('\n') +
             `\n${_shareUrl}`;
