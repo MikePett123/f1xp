@@ -165,7 +165,7 @@
         </div>
 
         <!-- ─── NEXT RACE ─── -->
-        <div id="tab-next" class="tab-pane active fade-in" role="tabpanel">
+        <div id="tab-next" class="tab-pane active" role="tabpanel">
             <div class="bg-f1-dark text-white rounded-2xl p-4 sm:p-6 mb-5 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
                 <div class="text-5xl">🇯🇵</div>
                 <div class="flex-1">
@@ -211,9 +211,9 @@
                 <div class="bg-yellow-50 border-b border-yellow-100 px-4 sm:px-6 py-2 text-xs text-yellow-700 font-semibold flex items-center gap-2" id="quali-warning">
                     <span>⚠</span> Qualifying not yet held — grid positions predicted from car pace model
                 </div>
-                <div class="grid grid-cols-12 gap-2 px-4 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
-                    <div class="col-span-1 text-center">Race</div>
-                    <div class="col-span-6">Driver</div>
+                <div class="grid grid-cols-12 gap-0 sm:gap-2 px-2 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
+                    <div class="col-span-1 text-center">Pos</div>
+                    <div class="col-span-6 pl-1">Driver</div>
                     <div class="col-span-2 text-right">Exp. Q</div>
                     <div class="col-span-3 text-right">XPs</div>
                 </div>
@@ -223,12 +223,12 @@
         </div>
 
         <!-- ─── PREVIOUS RACES ─── -->
-        <div id="tab-previous" class="tab-pane fade-in" role="tabpanel">
+        <div id="tab-previous" class="tab-pane" role="tabpanel">
             <div class="space-y-4" id="previous-races-list"></div>
         </div>
 
         <!-- ─── CHAMPIONSHIP ─── -->
-        <div id="tab-championship" class="tab-pane fade-in" role="tabpanel">
+        <div id="tab-championship" class="tab-pane" role="tabpanel">
             <div class="flex gap-2 mb-6" role="tablist" aria-label="Championship type">
                 <!-- #9: Larger touch targets py-2.5 -->
                 <button class="champ-tab-btn text-sm font-bold px-5 py-2.5 rounded-xl bg-f1-dark text-white" data-champ="drivers" role="tab" aria-selected="true">Drivers</button>
@@ -238,7 +238,7 @@
             <div id="champ-drivers" class="bg-white rounded-2xl overflow-hidden border border-f1-dark/8">
                 <div class="px-4 sm:px-6 py-4 border-b border-f1-cream flex items-center justify-between">
                     <div>
-                        <h3 class="font-black text-f1-dark text-lg">2026 Driver Championship</h3>
+                        <h3 class="font-black text-f1-dark text-lg">Driver Championship</h3>
                         <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China · Actual pts vs F1XPs accumulated expected pts</p>
                     </div>
                     <button onclick="openShareModal('championship')" class="text-f1-muted hover:text-f1-dark p-2 rounded-lg transition-colors" title="Share standings">
@@ -260,7 +260,7 @@
 
             <div id="champ-constructors" class="hidden bg-white rounded-2xl overflow-hidden border border-f1-dark/8 mt-4">
                 <div class="px-4 sm:px-6 py-4 border-b border-f1-cream">
-                    <h3 class="font-black text-f1-dark text-lg">2026 Constructor Championship</h3>
+                    <h3 class="font-black text-f1-dark text-lg">Constructor Championship</h3>
                     <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China</p>
                 </div>
                 <!-- #7: Responsive constructor grid -->
@@ -277,10 +277,10 @@
         </div>
 
         <!-- #25: SEASON CALENDAR -->
-        <div id="tab-calendar" class="tab-pane fade-in" role="tabpanel">
+        <div id="tab-calendar" class="tab-pane" role="tabpanel">
             <div class="bg-white rounded-2xl overflow-hidden border border-f1-dark/8">
                 <div class="px-4 sm:px-6 py-4 border-b border-f1-cream">
-                    <h3 class="font-black text-f1-dark text-lg">2026 Season Calendar</h3>
+                    <h3 class="font-black text-f1-dark text-lg">Season Calendar</h3>
                     <p class="text-f1-muted text-xs mt-0.5">24 rounds · March to December</p>
                 </div>
                 <div id="season-calendar" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0"></div>
@@ -877,9 +877,9 @@ function renderDriverGrid(rainProb) {
         const qColor = qDiff >= 3 ? 'text-green-500 font-bold' : qDiff <= -3 ? 'text-red-400 font-bold' : 'text-f1-muted';
 
         return `
-        <div class="driver-row grid grid-cols-12 gap-2 px-4 sm:px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''}">
-            <div class="col-span-1 text-center text-sm ${rankStyle}">P${raceRank}</div>
-            <div class="col-span-6 flex items-center gap-2 min-w-0">
+        <div class="driver-row grid grid-cols-12 gap-0 sm:gap-2 px-2 sm:px-6 py-3.5 items-center transition-colors ${d.xpPts === 0 ? 'opacity-50' : ''}">
+            <div class="col-span-1 text-center text-xs sm:text-sm ${rankStyle}">P${raceRank}</div>
+            <div class="col-span-6 flex items-center gap-1 sm:gap-2 min-w-0 pl-1 sm:pl-0">
                 ${driverAvatar(d.id, team.color)}
                 <div class="min-w-0">
                     <div class="font-bold text-f1-dark text-sm leading-tight truncate">${d.name}</div>
