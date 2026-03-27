@@ -740,7 +740,7 @@ function buildPredictedGrid(raceNum) {
 // Expected qualifying grid — uses quali rating (one-lap ability) instead of race f125
 function buildQualiGrid(raceNum) {
     const ranked = DRIVERS
-        .map(d => ({ id: d.id, score: carCoeff(d.team, raceNum) * (1 + (d.quali - 80) * 0.004) }))
+        .map(d => ({ id: d.id, score: carCoeff(d.team, raceNum) * (1 + (d.quali - 80) * 0.0025) }))
         .sort((a, b) => b.score - a.score);
     const pos = {};
     ranked.forEach((d, i) => { pos[d.id] = i + 1; });
