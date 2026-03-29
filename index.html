@@ -93,7 +93,7 @@
         </div>
         <div class="flex items-center gap-4 text-sm">
             <!-- #17: Improved contrast from /40 to /60 -->
-            <span class="text-white/60 text-xs hidden sm:block">After Rd 2 · China</span>
+            <span class="text-white/60 text-xs hidden sm:block">After Rd 3 · Japan</span>
             <!-- #12: Changed "Live" to "Updated" — no live data stream -->
             <span class="flex items-center gap-1.5 text-f1-teal font-semibold text-xs uppercase tracking-widest">
                 <span class="w-1.5 h-1.5 rounded-full bg-f1-teal"></span>Updated
@@ -167,12 +167,12 @@
         <!-- ─── NEXT RACE ─── -->
         <div id="tab-next" class="tab-pane active" role="tabpanel">
             <div class="bg-f1-dark text-white rounded-2xl p-4 sm:p-6 mb-5 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
-                <div class="text-5xl">🇯🇵</div>
+                <div class="text-5xl">🇺🇸</div>
                 <div class="flex-1">
                     <!-- #17: Improved contrast -->
-                    <p class="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">Round 3 · 2026</p>
-                    <h2 class="text-2xl font-black tracking-tight">Japanese Grand Prix</h2>
-                    <p class="text-white/60 text-sm mt-1">Suzuka International Racing Course · 53 laps · 5.807 km</p>
+                    <p class="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">Round 4 · 2026</p>
+                    <h2 class="text-2xl font-black tracking-tight">Miami Grand Prix</h2>
+                    <p class="text-white/60 text-sm mt-1">Miami International Autodrome · 57 laps · 5.412 km</p>
                 </div>
                 <div class="flex gap-4 sm:gap-6 md:gap-8 flex-wrap">
                     <!-- #30: Countdown timer -->
@@ -239,7 +239,7 @@
                 <div class="px-4 sm:px-6 py-4 border-b border-f1-cream flex items-center justify-between">
                     <div>
                         <h3 class="font-black text-f1-dark text-lg">Driver Championship</h3>
-                        <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China · Actual pts vs F1XPs accumulated expected pts</p>
+                        <p class="text-f1-muted text-xs mt-0.5">After Round 3 · Japan · Actual pts vs F1XPs accumulated expected pts</p>
                     </div>
                     <button onclick="openShareModal('championship')" class="text-f1-muted hover:text-f1-dark p-2 rounded-lg transition-colors" title="Share standings">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
@@ -261,7 +261,7 @@
             <div id="champ-constructors" class="hidden bg-white rounded-2xl overflow-hidden border border-f1-dark/8 mt-4">
                 <div class="px-4 sm:px-6 py-4 border-b border-f1-cream">
                     <h3 class="font-black text-f1-dark text-lg">Constructor Championship</h3>
-                    <p class="text-f1-muted text-xs mt-0.5">After Round 2 + Sprint · China</p>
+                    <p class="text-f1-muted text-xs mt-0.5">After Round 3 · Japan</p>
                 </div>
                 <!-- #7: Responsive constructor grid -->
                 <div class="grid grid-cols-8 sm:grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-6 py-3 text-xs font-bold text-f1-muted uppercase tracking-wider border-b border-f1-cream bg-f1-cream/50">
@@ -363,7 +363,7 @@
         <p class="text-center text-xs leading-relaxed max-w-sm text-white/50">
             F1XPs is a fan project. Not affiliated with Formula 1, FIA, or any constructor. Live weather via Open-Meteo.
         </p>
-        <div class="text-xs text-white/40">Rounds 1–2 complete · Round 3 next</div>
+        <div class="text-xs text-white/40">Rounds 1–3 complete · Round 4 next</div>
     </div>
 </footer>
 
@@ -374,11 +374,11 @@
 //  NEXT RACE CONFIG (#4, #5: No more hardcoded values)
 // ═══════════════════════════════════════════════════════
 const NEXT_RACE = {
-    round: 3,
-    name: 'Japanese Grand Prix',
-    circuitId: 'suzuka',
-    date: '2026-04-06',
-    raceDate: new Date('2026-04-06T14:00:00+09:00'),
+    round: 4,
+    name: 'Miami Grand Prix',
+    circuitId: 'miami',
+    date: '2026-05-03',
+    raceDate: new Date('2026-05-03T21:30:00-04:00'),
 };
 
 // ═══════════════════════════════════════════════════════
@@ -390,27 +390,27 @@ const NEXT_RACE = {
 // ═══════════════════════════════════════════════════════
 
 const BETTING_ODDS = {
-    // Decimal odds for race winner — Japan GP 2026
-    // Based on Mercedes dominance (2x 1-2), Ferrari P3/P4, and pre-season form
-    rus: 2.75,   // Russell — favourite, 2 wins from 2
-    ant: 3.50,   // Antonelli — P1 China, strong momentum
-    lec: 6.00,   // Leclerc — consistent P3/P4, best of the rest
-    ham: 7.00,   // Hamilton — Ferrari P3/P4, veteran factor
-    nor: 12.00,  // Norris — McLaren 3rd best car but underperforming
-    ver: 15.00,  // Verstappen — Red Bull 4th car, individual brilliance
-    pia: 17.00,  // Piastri — McLaren, DNS issues masking pace
-    bea: 26.00,  // Bearman — Haas surprise package
-    gas: 34.00,  // Gasly — Alpine midfield, scored both races
-    law: 41.00,  // Lawson — Racing Bulls, P7 China
-    had: 51.00,  // Hadjar — Red Bull junior, inconsistent
-    ocon: 67.00, // Ocon — Haas, occasional points
-    sai: 67.00,  // Sainz — Williams, Q struggles
+    // Decimal odds for race winner — Miami GP 2026
+    // Based on Antonelli 2-win streak, Mercedes pace, Ferrari P3/P4 trend
+    ant: 2.50,   // Antonelli — back-to-back wins, championship leader
+    rus: 3.50,   // Russell — consistent front-runner, Mercedes pace
+    lec: 6.00,   // Leclerc — P3 Japan, Ferrari strong at power circuits
+    ham: 8.00,   // Hamilton — P6 Japan, recovering confidence
+    nor: 10.00,  // Norris — McLaren 3rd best car, US home crowd boost
+    pia: 13.00,  // Piastri — P2 Japan, building momentum
+    ver: 17.00,  // Verstappen — Red Bull struggling, circuit may suit
+    gas: 29.00,  // Gasly — Alpine P7, consistent scorer
+    law: 41.00,  // Lawson — Racing Bulls, P9 Japan
+    bea: 51.00,  // Bearman — Haas DNF Japan, pace still there
+    had: 51.00,  // Hadjar — Red Bull junior
+    ocon: 67.00, // Ocon — Haas, P10 Japan
+    sai: 67.00,  // Sainz — Williams, overachiever
     lin: 81.00,  // Lindblad — Racing Bulls rookie
     col: 101.00, // Colapinto — Alpine
     alb: 101.00, // Albon — Williams
     hul: 101.00, // Hülkenberg — Audi
     bor: 151.00, // Bortoleto — Audi rookie
-    alo: 151.00, // Alonso — Aston Martin struggles
+    alo: 151.00, // Alonso — Aston Martin
     str: 251.00, // Stroll — Aston Martin
     per: 251.00, // Pérez — Cadillac
     bot: 301.00, // Bottas — Cadillac
@@ -531,9 +531,9 @@ const DRIVERS = [
 ];
 
 const ACTUAL_POINTS = {
-    rus:51, ant:47, lec:34, ham:33, bea:17, nor:15, gas:9, ver:8, law:8,
-    lin:4, had:4, pia:3, bor:2, sai:2, col:1,
-    ocon:0, alb:0, hul:0, alo:0, str:0, per:0, bot:0,
+    ant:72, rus:63, lec:49, ham:41, nor:25, pia:21, bea:17, gas:15, ver:12, law:10,
+    lin:4, had:4, bor:2, sai:2, ocon:1, col:1,
+    hul:0, alb:0, alo:0, str:0, per:0, bot:0,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -636,6 +636,10 @@ const CIRCUITS = {
         name:'Shanghai', lat:31.3400, lon:121.2200, stickiness:0.93, sc_prob:0.38,
         baseXP: genericBaseXP(0.93), ciHalf: genericCIHalf(0.93),
     },
+    miami: {
+        name:'Miami', lat:25.9582, lon:-80.2389, stickiness:0.90, sc_prob:0.55,
+        baseXP: genericBaseXP(0.90), ciHalf: genericCIHalf(0.90),
+    },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -705,6 +709,24 @@ function calcXP(driver, gridPos, circuitId, rainProb, raceNum, isSprint) {
 // ═══════════════════════════════════════════════════════
 
 const PAST_RACES = [
+    {
+        round:'3', name:'Japanese Grand Prix', circuit:'Suzuka International Racing Course',
+        circuitId:'suzuka', date:'29 Mar 2026', flag:'🇯🇵', type:'Race',
+        raceNum:3, rainProb:0.00,
+        grid:{ ant:1,rus:2,pia:3,lec:4,nor:5,ham:6,gas:7,had:8,bor:9,lin:10,
+               ver:11,ocon:12,hul:13,law:14,col:15,sai:16,alb:17,bea:18,
+               per:19,bot:20,alo:21,str:22 },
+        results:[
+            {id:'ant',pos:1,pts:25},{id:'pia',pos:2,pts:18},{id:'lec',pos:3,pts:15},
+            {id:'rus',pos:4,pts:12},{id:'nor',pos:5,pts:10},{id:'ham',pos:6,pts:8},
+            {id:'gas',pos:7,pts:6},{id:'ver',pos:8,pts:4},{id:'law',pos:9,pts:2},
+            {id:'ocon',pos:10,pts:1},{id:'hul',pos:11,pts:0},{id:'had',pos:12,pts:0},
+            {id:'bor',pos:13,pts:0},{id:'lin',pos:14,pts:0},{id:'sai',pos:15,pts:0},
+            {id:'col',pos:16,pts:0},{id:'per',pos:17,pts:0},{id:'alo',pos:18,pts:0},
+            {id:'bot',pos:19,pts:0},{id:'alb',pos:20,pts:0},
+            {id:'str',pos:21,pts:0},{id:'bea',pos:22,pts:0},
+        ],
+    },
     {
         round:'2', name:'Chinese Grand Prix', circuit:'Shanghai International Circuit',
         circuitId:'shanghai', date:'15 Mar 2026', flag:'🇨🇳', type:'Race',
@@ -1164,10 +1186,10 @@ function renderCoralStats() {
 const CALENDAR_2026 = [
     { rd:1,  name:'Australian GP',    loc:'Melbourne',     date:'8 Mar',  flag:'🇦🇺', completed:true },
     { rd:2,  name:'Chinese GP',       loc:'Shanghai',      date:'15 Mar', flag:'🇨🇳', completed:true },
-    { rd:3,  name:'Japanese GP',      loc:'Suzuka',        date:'6 Apr',  flag:'🇯🇵', next:true },
+    { rd:3,  name:'Japanese GP',      loc:'Suzuka',        date:'29 Mar', flag:'🇯🇵', completed:true },
     { rd:4,  name:'Bahrain GP',       loc:'Sakhir',        date:'13 Apr', flag:'🇧🇭', cancelled:true },
     { rd:5,  name:'Saudi Arabian GP', loc:'Jeddah',        date:'20 Apr', flag:'🇸🇦', cancelled:true },
-    { rd:6,  name:'Miami GP',         loc:'Miami',         date:'4 May',  flag:'🇺🇸' },
+    { rd:6,  name:'Miami GP',         loc:'Miami',         date:'3 May',  flag:'🇺🇸', next:true },
     { rd:7,  name:'Emilia Romagna GP',loc:'Imola',         date:'18 May', flag:'🇮🇹' },
     { rd:8,  name:'Monaco GP',        loc:'Monte Carlo',   date:'25 May', flag:'🇲🇨' },
     { rd:9,  name:'Spanish GP',       loc:'Barcelona',     date:'1 Jun',  flag:'🇪🇸' },
