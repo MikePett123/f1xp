@@ -1046,16 +1046,39 @@ function computeChampPositions() {
     return { expChampPos, expCtorPos };
 }
 
+// F1 tiebreaker: compare sorted finishing positions (best first). Lower = better.
+function tiebreakFinishes(aF, bF) {
+    const len = Math.max(aF.length, bF.length);
+    for (let i = 0; i < len; i++) {
+        const diff = (aF[i] ?? 99) - (bF[i] ?? 99);
+        if (diff !== 0) return diff;
+    }
+    return 0;
+}
+
 function renderChampionship() {
     const xpAcc = computeAccumulatedF1XPs();
     const { expChampPos, expCtorPos } = computeChampPositions();
+
+    // Build each driver's finishing positions (sorted ascending = best first) for tiebreaking
+    const driverFinishes = {};
+    DRIVERS.forEach(d => { driverFinishes[d.id] = []; });
+    PAST_RACES.forEach(race => {
+        race.results.forEach(r => {
+            if (r.pos) (driverFinishes[r.id] = driverFinishes[r.id] || []).push(r.pos);
+        });
+    });
+    Object.keys(driverFinishes).forEach(id => driverFinishes[id].sort((a, b) => a - b));
 
     const standings = DRIVERS.map(d => ({
         driver: d, team: TEAMS[d.team],
         pts: ACTUAL_POINTS[d.id] || 0,
         xp:  xpAcc[d.id] || 0,
         expChamp: expChampPos[d.id] || null,
-    })).sort((a, b) => b.pts - a.pts);
+    })).sort((a, b) => {
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        return tiebreakFinishes(driverFinishes[a.driver.id] || [], driverFinishes[b.driver.id] || []);
+    });
 
     // #1/#7: Responsive grid matching header
     document.getElementById('driver-standings').innerHTML = standings.map((s, i) => {
@@ -1110,7 +1133,12 @@ function renderChampionship() {
         ctorMap[t].pts += s.pts;
         ctorMap[t].xp  += s.xp;
     });
-    const ctors = Object.values(ctorMap).sort((a, b) => b.pts - a.pts);
+    const ctors = Object.values(ctorMap).sort((a, b) => {
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        const aF = DRIVERS.filter(d => d.team === a.key).flatMap(d => driverFinishes[d.id] || []).sort((x,y) => x-y);
+        const bF = DRIVERS.filter(d => d.team === b.key).flatMap(d => driverFinishes[d.id] || []).sort((x,y) => x-y);
+        return tiebreakFinishes(aF, bF);
+    });
     document.getElementById('constructor-standings').innerHTML = ctors.map((c, i) => {
         const rank   = i + 1;
         const exp    = expCtorPos[c.key] || null;
